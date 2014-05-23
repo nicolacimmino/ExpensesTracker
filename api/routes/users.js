@@ -55,15 +55,25 @@ router.get('/:username', function(req, res) {
  * Error: 404 if the specified user doesn't exist.
  * Error: 401 if the suppliced username/password don't match.
  */
-router.get('/:username/auth_token', function(req, res) {
+router.post('/:username/auth_token', function(req, res) {
   
   var db = req.db;
     db.get('users').find({ username: req.params.username },{}, function(e,docs){
 		if(docs.length == 1) {
 		    // TODO: do proper password hashing and salting here!
-			if(docs[0].password == req.query.password) {
+			if(docs[0].password == req.body.password) {
 				require('crypto').randomBytes(48, function(ex, buf) {
-					res.json( { "auth_token": buf.toString('hex') } );
+					db.get('auth_tokens').insert({
+								'username':req.params.username,
+								'auth_token': buf.toString('hex') 
+								},
+								function(err, doc) {
+									if(err) {
+										res.send(500);
+									} else {
+										res.json( { "auth_token": buf.toString('hex') } );
+									}
+								});
 				});
 			} else {
 				res.send(401);
@@ -74,7 +84,5 @@ router.get('/:username/auth_token', function(req, res) {
     });
 	
 });
-
-
 
 module.exports = router;
