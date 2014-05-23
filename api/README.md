@@ -6,7 +6,9 @@ API
 **HTTP GET /users/:username**
 
 **username**: the username of the user.
+
 **Returns**: the specified user information.
+
 **Error**: 404 if the specified user doesn't exist.
  
 
