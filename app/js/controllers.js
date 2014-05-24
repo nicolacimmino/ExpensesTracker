@@ -2,10 +2,13 @@
 
 /* Controllers */
 
-angular.module('myApp.controllers', [])
-  .controller('MyCtrl1', ['$scope', function($scope) {
+  
+angular.module('ExpensesWebClient.controllers', []).
+  controller('expensesController', function($scope, expensesAPIservice) {
+    $scope.nameFilter = null;
+    $scope.expensesList = [];
 
-  }])
-  .controller('MyCtrl2', ['$scope', function($scope) {
-
-  }]);
+    expensesAPIservice.getExpenses().success(function (response,status, headers, config) {
+        $scope.expensesList = response;
+    });
+  });
