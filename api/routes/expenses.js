@@ -1,5 +1,5 @@
 /* expenses.js is part of ExpensesWebInterface and is responsible to
- ~      provide routing for API requests to the expenses resource.
+ *      provide routing for API requests to the expenses resource.
  *
  *   Copyright (C) 2014 Nicola Cimmino
  *

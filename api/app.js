@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk('localhost:27017/expenses');
+var cors = require('cors')
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -26,10 +27,20 @@ app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(cors());
+
 app.use(function(req,res,next){
     req.db = db;
     next();
 });
+
+// Prevents 304 responses.
+// Mainly suitable during development. Creates extra traffic in production.
+app.use(function(req, res, next) {
+  req.headers['if-none-match'] = 'no-match-for-this';
+  next();    
+});
+
 
 app.use('/', routes);
 app.use('/users', users);
