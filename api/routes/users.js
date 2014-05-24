@@ -1,5 +1,5 @@
 /* users.js is part of ExpensesWebInterface and is responsible to
- ~ 	 provide routing for API requests to the users resource.
+ ~      provide routing for API requests to the users resource.
  *
  *   Copyright (C) 2014 Nicola Cimmino
  *
@@ -40,13 +40,13 @@ router.get('/:username', function(req, res) {
   
   var db = req.db;
     db.get('users').find({ username: req.params.username },{}, function(e,docs){
-		if(docs.length == 1) {
-			res.json( { "username": docs[0].username } );
-		} else {
-			res.send(404);
-		}
+        if(docs.length == 1) {
+            res.json( { "username": docs[0].username } );
+        } else {
+            res.send(404);
+        }
     });
-	
+    
 });
 
 
@@ -61,32 +61,32 @@ router.post('/:username/auth_token', function(req, res) {
   
     var db = req.db;
     db.get('users').find({ username: req.params.username },{}, function(e,docs){
-		if(docs.length == 1) {
-		    // While we don't have the API to register a new user log the expected
-			//	salted and hashed password so we can store it in db and login.
-		    //console.log(bcrypt.hashSync("bla", 10));
-			if(bcrypt.compareSync(req.body.password, docs[0].password)) {
-					crypto.randomBytes(48, function(ex, buf) {
-					db.get('auth_tokens').insert({
-								'username':req.params.username,
-								'auth_token': buf.toString('hex') 
-								},
-								function(err, doc) {
-									if(err) {
-										res.send(500);
-									} else {
-										res.json( { "auth_token": buf.toString('hex') } );
-									}
-								});
-				});
-			} else {
-				res.send(401);
-			}
-		} else {
-			res.send(404);
-		}
+        if(docs.length == 1) {
+            // While we don't have the API to register a new user log the expected
+            //    salted and hashed password so we can store it in db and login.
+            //console.log(bcrypt.hashSync("bla", 10));
+            if(bcrypt.compareSync(req.body.password, docs[0].password)) {
+                    crypto.randomBytes(48, function(ex, buf) {
+                    db.get('auth_tokens').insert({
+                                'username':req.params.username,
+                                'auth_token': buf.toString('hex') 
+                                },
+                                function(err, doc) {
+                                    if(err) {
+                                        res.send(500);
+                                    } else {
+                                        res.json( { "auth_token": buf.toString('hex') } );
+                                    }
+                                });
+                });
+            } else {
+                res.send(401);
+            }
+        } else {
+            res.send(404);
+        }
     });
-	
+    
 });
 
 module.exports = router;

@@ -1,5 +1,5 @@
 /* expenses.js is part of ExpensesWebInterface and is responsible to
- ~ 	 provide routing for API requests to the expenses resource.
+ ~      provide routing for API requests to the expenses resource.
  *
  *   Copyright (C) 2014 Nicola Cimmino
  *
@@ -31,14 +31,14 @@ router.get('/:username', function(req, res) {
   
   var db = req.db;
   db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
-			if(docs.length == 1 && docs[0].username==req.params.username) {
-				db.get('expenses').find({ username: req.params.username },{}, function(e,docs){
-					res.json( docs );
-				});
-			} else {
-				res.send(401);
-			}
-		});
+            if(docs.length == 1 && docs[0].username==req.params.username) {
+                db.get('expenses').find({ username: req.params.username },{}, function(e,docs){
+                    res.json( docs );
+                });
+            } else {
+                res.send(401);
+            }
+        });
 });
 
 /* HTTP POST /expenses/:username?auth_token=auth_token
@@ -49,19 +49,19 @@ router.get('/:username', function(req, res) {
  * Error: 401 if the auth_token doesn't authorize the operation.
  */
 router.post('/:username', function(req, res) {
-	
-	var db = req.db;
-	expense = req.body;
-	db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
-			if(docs.length == 1 && docs[0].username==req.params.username) {
-				expense.username = req.params.username;
-				db.get('expenses').insert(expense,{}, function(e,docs){
-					res.send(200);
-				});
-			} else {
-				res.send(401);
-			}
-		});
+    
+    var db = req.db;
+    expense = req.body;
+    db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+            if(docs.length == 1 && docs[0].username==req.params.username) {
+                expense.username = req.params.username;
+                db.get('expenses').insert(expense,{}, function(e,docs){
+                    res.send(200);
+                });
+            } else {
+                res.send(401);
+            }
+        });
  
 });
 
