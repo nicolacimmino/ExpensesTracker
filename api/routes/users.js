@@ -21,6 +21,8 @@
 
 var express = require('express');
 var router = express.Router();
+var bcrypt = require('bcrypt');
+var crypto = require('crypto');
 
 /* GET users listing. 
  * We do not allow users listing. Deny.
@@ -57,12 +59,14 @@ router.get('/:username', function(req, res) {
  */
 router.post('/:username/auth_token', function(req, res) {
   
-  var db = req.db;
+    var db = req.db;
     db.get('users').find({ username: req.params.username },{}, function(e,docs){
 		if(docs.length == 1) {
-		    // TODO: do proper password hashing and salting here!
-			if(docs[0].password == req.body.password) {
-				require('crypto').randomBytes(48, function(ex, buf) {
+		    // While we don't have the API to register a new user log the expected
+			//	salted and hashed password so we can store it in db and login.
+		    //console.log(bcrypt.hashSync("bla", 10));
+			if(bcrypt.compareSync(req.body.password, docs[0].password)) {
+					crypto.randomBytes(48, function(ex, buf) {
 					db.get('auth_tokens').insert({
 								'username':req.params.username,
 								'auth_token': buf.toString('hex') 

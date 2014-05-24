@@ -41,6 +41,29 @@ router.get('/:username', function(req, res) {
 		});
 });
 
+/* HTTP POST /expenses/:username?auth_token=auth_token
+ * Param username: the username of the user.
+ * Query param auth_token: a valid authoerization tolken
+ * POST data: a json describing the expense
+ * Returns: all expenses for the specified user.
+ * Error: 401 if the auth_token doesn't authorize the operation.
+ */
+router.post('/:username', function(req, res) {
+	
+	var db = req.db;
+	expense = req.body;
+	db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+			if(docs.length == 1 && docs[0].username==req.params.username) {
+				expense.username = req.params.username;
+				db.get('expenses').insert(expense,{}, function(e,docs){
+					res.send(200);
+				});
+			} else {
+				res.send(401);
+			}
+		});
+ 
+});
 
 
 module.exports = router;
