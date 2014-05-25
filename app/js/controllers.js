@@ -24,10 +24,19 @@ angular.module('ExpensesWebClient.controllers', []).
   controller('expensesController', function($scope, expensesAPIservice) {
     
     $scope.expensesList = [];
-	
+	 $scope.authToken = "";
+	 
 	// Asyncronously fetch expenses from the API and report them to the scope.
-    expensesAPIservice.getExpenses().success(function (response,status, headers, config) {
+    expensesAPIservice.getExpenses($scope.authToken).success(function (response,status, headers, config) {
         $scope.expensesList = response;
     });
 	
+	// Asyncronously fetch the auth token from the API and report it to the scope.
+    $scope.login = function (username, password) {
+		expensesAPIservice.getAuthToken(username, password).success(function (response,status, headers, config) {
+        $scope.authToken = response;
+		});
+ 	  };
+	  
   });
+  

@@ -29,12 +29,24 @@ angular.module('ExpensesWebClient.services', []).
 
 	// Get all expenses.
 	// Currently there is no pagination in the API, this will change.
-    expensesAPIservice.getExpenses = function() {
+    expensesAPIservice.getExpenses = function(authToken) {
       return $http({
         method: 'GET', 
-        url: 'http://127.0.0.1:3000/expenses/nicola?auth_token=6c527ed6fd191b9d70f53c832dc797e2b8c556c4fc99e1486fbdf60aa37fc0301da147cdddffb6e6a86c05cfdc0e8848'
+        url: 'http://127.0.0.1:3000/expenses/nicola?auth_token=' + authToken
       });
     }
 
+	// Get an authentication token.
+	expensesAPIservice.getAuthToken = function(username, password) {
+      return $http({
+        method: 'POST', 
+        url: 'http://127.0.0.1:3000/users/'+username+'/auth_token',
+		data: {
+			password:password
+		}
+      });
+    }
+
+	
     return expensesAPIservice;
   });
