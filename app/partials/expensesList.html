@@ -1,0 +1,16 @@
+<table>
+    <thead>
+      <tr><th colspan="4">Expenses</th></tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="expense in expensesList">
+        <td>{{$index + 1}}</td>
+        <td>
+           Expense
+        </td>
+        <td>{{expense.amount}}</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  

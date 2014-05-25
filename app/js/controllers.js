@@ -21,22 +21,29 @@
 // Define the expensesController which depends on expensesAPIservice.
 // This controller is responsible to provide expenses data to the scope.
 angular.module('ExpensesWebClient.controllers', []).
-  controller('expensesController', function($scope, expensesAPIservice) {
-    
-    $scope.expensesList = [];
-	 $scope.authToken = "";
-	 
-	// Asyncronously fetch expenses from the API and report them to the scope.
-    expensesAPIservice.getExpenses($scope.authToken).success(function (response,status, headers, config) {
-        $scope.expensesList = response;
-    });
-	
+ 
+  controller('loginController', function($scope, $location, expensesAPIservice, SharedData) {
+     	
 	// Asyncronously fetch the auth token from the API and report it to the scope.
     $scope.login = function (username, password) {
 		expensesAPIservice.getAuthToken(username, password).success(function (response,status, headers, config) {
-        $scope.authToken = response;
+        SharedData.authToken = response.auth_token;
+		$location.path('/expenses');
 		});
  	  };
 	  
+  }).
+  
+  controller('expensesController', function($scope, $routeParams, expensesAPIservice, SharedData) {
+    
+	$scope.expensesList = [];
+	 
+	// Asyncronously fetch expenses from the API and report them to the scope.
+	if(SharedData.authToken!="") {
+		expensesAPIservice.getExpenses(SharedData.authToken).success(function (response,status, headers, config) {
+			$scope.expensesList = response;
+		});  
+	}
   });
+  
   

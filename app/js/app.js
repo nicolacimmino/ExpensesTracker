@@ -22,5 +22,15 @@
 //	into the ExpensesWebClient module.
 angular.module('ExpensesWebClient', [
   'ExpensesWebClient.controllers',
-  'ExpensesWebClient.services'
-]);
+  'ExpensesWebClient.services',
+  'ngRoute'
+]).
+config(['$routeProvider', function($routeProvider) {
+  $routeProvider.
+	when("/", {templateUrl: "partials/loginForm.html", controller: "loginController"}).
+	when("/expenses", {templateUrl: "partials/expensesList.html", controller: "expensesController"}).
+	otherwise({redirectTo: '/'});
+}]).
+factory('SharedData', function() {
+		return { authToken:"" };
+});
