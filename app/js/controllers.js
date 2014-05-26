@@ -23,27 +23,36 @@
 angular.module('ExpensesWebClient.controllers', []).
  
   controller('loginController', function($scope, $location, expensesAPIservice, SharedData) {
-     	
-	// Asyncronously fetch the auth token from the API and report it to the scope.
+       
+  // Asyncronously fetch the auth token from the API and report it to the scope.
     $scope.login = function (username, password) {
-		expensesAPIservice.getAuthToken(username, password).success(function (response,status, headers, config) {
+    expensesAPIservice.getAuthToken(username, password).success(function (response,status, headers, config) {
         SharedData.authToken = response.auth_token;
-		$location.path('/expenses');
-		});
- 	  };
-	  
+    $location.path('/expenses');
+    });
+     };
+    
   }).
   
   controller('expensesController', function($scope, $routeParams, expensesAPIservice, SharedData) {
     
-	$scope.expensesList = [];
-	 
-	// Asyncronously fetch expenses from the API and report them to the scope.
-	if(SharedData.authToken!="") {
-		expensesAPIservice.getExpenses(SharedData.authToken).success(function (response,status, headers, config) {
-			$scope.expensesList = response;
-		});  
-	}
+  $scope.expensesList = [];
+   
+  // Asyncronously fetch expenses from the API and report them to the scope.
+  if(SharedData.authToken!="") {
+    expensesAPIservice.getExpenses(SharedData.authToken).success(function (response,status, headers, config) {
+      $scope.expensesList = response;
+    });  
+  }
+  }).
+  
+  controller('expenseEditController', function($scope, $routeParams, expensesAPIservice, SharedData) {
+  
+  if(SharedData.authToken!='' && $routeParams.id!="") {
+    expensesAPIservice.getExpense(SharedData.authToken,$routeParams.id).success(function (response, status, headers, config) {
+      $scope.expense = response[0];
+      });
+  }
   });
   
   

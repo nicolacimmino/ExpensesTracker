@@ -19,7 +19,7 @@
 'use strict';
 
 // Inject dependencies to controllers and services
-//	into the ExpensesWebClient module.
+//  into the ExpensesWebClient module.
 angular.module('ExpensesWebClient', [
   'ExpensesWebClient.controllers',
   'ExpensesWebClient.services',
@@ -27,10 +27,11 @@ angular.module('ExpensesWebClient', [
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.
-	when("/", {templateUrl: "partials/loginForm.html", controller: "loginController"}).
-	when("/expenses", {templateUrl: "partials/expensesList.html", controller: "expensesController"}).
-	otherwise({redirectTo: '/'});
+  when("/", {templateUrl: "partials/loginForm.html", controller: "loginController"}).
+  when("/expenses", {templateUrl: "partials/expensesList.html", controller: "expensesController"}).
+  when("/expenses/:id", {templateUrl: "partials/expenseEdit.html", controller: "expenseEditController"}).
+  otherwise({redirectTo: '/'});
 }]).
 factory('SharedData', function() {
-		return { authToken:"" };
+    return { authToken:"" };
 });

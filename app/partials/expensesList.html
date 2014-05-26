@@ -1,16 +1,16 @@
+<input type="text" ng-model="searchFilter.amount">
 <table>
     <thead>
-      <tr><th colspan="4">Expenses</th></tr>
+      <tr><th colspan="4">Expenses List</th></tr>
     </thead>
     <tbody>
-      <tr ng-repeat="expense in expensesList">
+      <tr ng-repeat="expense in expensesList | filter : searchFilter">
         <td>{{$index + 1}}</td>
-        <td>
-           Expense
-        </td>
+        <td>{{expense.from}}</td>
+        <td>{{expense.to}}</td>
         <td>{{expense.amount}}</td>
-        <td></td>
+        <td><a href="/app/#/expenses/{{expense._id}}">Edit b</a></td>
       </tr>
-    </tbody>
-  </table>
+  </tbody>
+ </table>
   
