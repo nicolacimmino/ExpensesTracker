@@ -41,6 +41,27 @@ router.get('/:username', function(req, res) {
         });
 });
 
+/* HTTP GET /expenses/:username/:id?auth_token=auth_token
+ * Param username: the username of the user.
+ * Param id: the id of the expense.
+ * Query param auth_token: a valid authoerization tolken
+ * Returns: a specific expense assuming it belogs to the user.
+ * Error: 401 if the auth_token doesn't authorize the operation.
+ */
+router.get('/:username/:id', function(req, res) {
+  
+  var db = req.db;
+  db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+            if(docs.length == 1 && docs[0].username==req.params.username) {
+                db.get('expenses').find({ username:req.params.username, _id:req.params.id },{}, function(e,docs){
+                    res.json( docs );
+                });
+            } else {
+                res.send(401);
+            }
+        });
+});
+
 /* HTTP POST /expenses/:username?auth_token=auth_token
  * Param username: the username of the user.
  * Query param auth_token: a valid authoerization tolken
@@ -79,17 +100,17 @@ router.put('/:username/:id', function(req, res) {
     expense = req.body;
     db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
             if(docs.length == 1 && docs[0].username==req.params.username) {
-				expense.username = req.params.username;
-				
-				db.get('expenses').update({'_id':req.params.id}, expense, {safe:true}, function(err, result) {
-						if (err) {
-							console.log('Error updating expense: ' + err);
-							res.send(500);
-						} else {
-							console.log('' + result + ' document(s) updated');
-							res.send(expense);
-						}
-					});
+        expense.username = req.params.username;
+        
+        db.get('expenses').update({'_id':req.params.id}, expense, {safe:true}, function(err, result) {
+            if (err) {
+              console.log('Error updating expense: ' + err);
+              res.send(500);
+            } else {
+              console.log('' + result + ' document(s) updated');
+              res.send(expense);
+            }
+          });
             } else {
                 res.send(401);
             }
@@ -110,17 +131,17 @@ router.delete('/:username/:id', function(req, res) {
     expense = req.body;
     db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
             if(docs.length == 1 && docs[0].username==req.params.username) {
-				expense.username = req.params.username;
-				
-				db.get('expenses').remove({'_id':req.params.id}, {safe:true}, function(err, result) {
-						if (err) {
-							console.log('Error deleting expense: ' + err);
-							res.send(500);
-						} else {
-							console.log('' + result + ' document(s) deleted');
-							res.send(200);
-						}
-					});
+        expense.username = req.params.username;
+        
+        db.get('expenses').remove({'_id':req.params.id}, {safe:true}, function(err, result) {
+            if (err) {
+              console.log('Error deleting expense: ' + err);
+              res.send(500);
+            } else {
+              console.log('' + result + ' document(s) deleted');
+              res.send(200);
+            }
+          });
             } else {
                 res.send(401);
             }
