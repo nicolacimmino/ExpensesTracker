@@ -46,12 +46,18 @@ angular.module('ExpensesWebClient.controllers', []).
   }
   }).
   
-  controller('expenseEditController', function($scope, $routeParams, expensesAPIservice, SharedData) {
+  controller('expenseEditController', function($scope, $location, $routeParams, expensesAPIservice, SharedData) {
   
   if(SharedData.authToken!='' && $routeParams.id!="") {
     expensesAPIservice.getExpense(SharedData.authToken,$routeParams.id).success(function (response, status, headers, config) {
       $scope.expense = response[0];
       });
+      
+   $scope.updateExpense = function() {
+    expensesAPIservice.updateExpense(SharedData.authToken, $scope.expense).success(function (response, status, headers, config) {
+      $location.path('/expenses');
+      })
+   }
   }
   });
   

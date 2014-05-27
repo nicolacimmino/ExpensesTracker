@@ -54,5 +54,14 @@ angular.module('ExpensesWebClient.services', []).
         });
     }
     
+    // Update an expense.
+    expensesAPIservice.updateExpense = function(authToken,expense) {
+        return $http({
+          method: 'PUT', 
+          url: 'http://127.0.0.1:3000/expenses/nicola/'+expense._id+'?auth_token=' + authToken,
+          data: expense
+        });
+      }
+      
     return expensesAPIservice;
   });
