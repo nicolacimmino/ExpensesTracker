@@ -1,14 +1,22 @@
 <input type="text" ng-model="searchFilter.amount">
 <table>
     <thead>
-      <tr><th colspan="4">Expenses List</th></tr>
+      <tr>
+      <th>Date</th>
+      <th>Method</th>
+      <th>Category</th>
+      <th>Amount</th>
+      <th>Notes</th>
+      <th></th>
+      </tr>
     </thead>
     <tbody>
       <tr ng-repeat="expense in expensesList | filter : searchFilter">
-        <td>{{$index + 1}}</td>
+        <td>{{expense.timestamp}}</td>
         <td>{{expense.from}}</td>
         <td>{{expense.to}}</td>
         <td>{{expense.amount}}</td>
+        <td>{{expense.notes}}</td>
         <td><a href="/app/#/expenses/{{expense._id}}">Edit b</a></td>
       </tr>
   </tbody>
