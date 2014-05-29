@@ -40,10 +40,10 @@
           <div class="masthead clearfix">
             <div class="inner">
               <h3 class="masthead-brand">Expenses Tracker.</h3>
-              <ul class="nav masthead-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#">Features</a></li>
-                <li><a href="#">Contact</a></li>
+              <ul class="nav masthead-nav" ng-controller="NavigationController">
+                <li ng-class="menuClass('home')"><a href="#/home">Home</a></li>
+                <li ng-class="menuClass('features')"><a href="#/features">Features</a></li>
+                <li ng-class="menuClass('contact')"><a href="#/contact">Contact</a></li>
               </ul>
             </div>
           </div>
@@ -55,7 +55,7 @@
           </div>
           <div class="mastfoot">
             <div class="inner">
-              <p>Cover template for <a href="http://getbootstrap.com">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>
+              <p>Layout based on a modified Cover template for <a href="http://getbootstrap.com">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>
             </div>
           </div>
 

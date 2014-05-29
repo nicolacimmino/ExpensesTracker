@@ -69,6 +69,13 @@ angular.module('ExpensesWebClient.controllers', []).
   {
     $location.path('/');
   }
-  });
+  }).
+  
+  controller("NavigationController", function($scope, $location) {
+  $scope.menuClass = function(page) {
+    var current = $location.path().substring(1);
+    return page === current ? "active" : "";
+  };
+});
   
   

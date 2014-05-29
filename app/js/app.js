@@ -27,10 +27,12 @@ angular.module('ExpensesWebClient', [
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.
-  when("/", {templateUrl: "partials/loginForm.html", controller: "loginController"}).
+  when("/home", {templateUrl: "partials/loginForm.html", controller: "loginController"}).
   when("/expenses", {templateUrl: "partials/expensesList.html", controller: "expensesController"}).
   when("/expenses/:id", {templateUrl: "partials/expenseEdit.html", controller: "expenseEditController"}).
-  otherwise({redirectTo: '/'});
+  when("/features", {templateUrl: "partials/features.html"}).
+  when("/contact", {templateUrl: "partials/contact.html"}).
+  otherwise({redirectTo: '/home'});
 }]).
 factory('SharedData', function() {
     return { authToken:"" };
