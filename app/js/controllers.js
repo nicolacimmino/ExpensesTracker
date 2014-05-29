@@ -34,7 +34,7 @@ angular.module('ExpensesWebClient.controllers', []).
     
   }).
   
-  controller('expensesController', function($scope, $routeParams, expensesAPIservice, SharedData) {
+  controller('expensesController', function($scope, $routeParams, $location, expensesAPIservice, SharedData) {
     
   $scope.expensesList = [];
    
@@ -43,6 +43,8 @@ angular.module('ExpensesWebClient.controllers', []).
     expensesAPIservice.getExpenses(SharedData.authToken).success(function (response,status, headers, config) {
       $scope.expensesList = response;
     });  
+  } else {
+    $location.path('/');
   }
   }).
   
