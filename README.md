@@ -7,3 +7,4 @@ The application allows to log into the service, list available expenses and edit
 
 Below are few screenshots of the application.
 
+![Screenshot](https://raw.github.com/nicolacimmino/ExpensesWebClient/master/documentation/screenshot.png)
