@@ -10,3 +10,9 @@ Below are few screenshots of the application.
 ![Screenshot](https://raw.github.com/nicolacimmino/ExpensesWebClient/master/documentation/screenshot2.png)
 
 ![Screenshot](https://raw.github.com/nicolacimmino/ExpensesWebClient/master/documentation/screenshot.png)
+
+On a more narrow screen, such as on a mobile phone, the layout flows and adjusts to accomodate the screen size:
+
+![Screenshot](https://raw.github.com/nicolacimmino/ExpensesWebClient/master/documentation/screenshot3.png)
+
+
