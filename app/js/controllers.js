@@ -38,6 +38,10 @@ angular.module('ExpensesWebClient.controllers', []).
     
   $scope.expensesList = [];
    
+  $scope.edit_expense = function(expense) {
+    $location.path("/expenses/"+expense._id);
+  };
+  
   // Asyncronously fetch expenses from the API and report them to the scope.
   if(SharedData.authToken!="") {
     expensesAPIservice.getExpenses(SharedData.authToken).success(function (response,status, headers, config) {
@@ -60,6 +64,10 @@ angular.module('ExpensesWebClient.controllers', []).
       $location.path('/expenses');
       })
    }
+  }
+  else
+  {
+    $location.path('/');
   }
   });
   
