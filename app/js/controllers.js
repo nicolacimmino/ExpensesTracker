@@ -48,7 +48,7 @@ angular.module('ExpensesWebClient.controllers', []).
       $scope.expensesList = response;
     });  
   } else {
-    $location.path('/');
+    $location.path('/login');
   }
   }).
   
@@ -67,7 +67,7 @@ angular.module('ExpensesWebClient.controllers', []).
   }
   else
   {
-    $location.path('/');
+    $location.path('/login');
   }
   }).
   

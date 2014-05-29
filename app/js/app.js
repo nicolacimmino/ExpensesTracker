@@ -27,7 +27,8 @@ angular.module('ExpensesWebClient', [
 ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.
-  when("/home", {templateUrl: "partials/loginForm.html", controller: "loginController"}).
+  when("/home", {templateUrl: "partials/home.html", controller: "loginController"}).
+  when("/login", {templateUrl: "partials/loginForm.html", controller: "loginController"}).
   when("/expenses", {templateUrl: "partials/expensesList.html", controller: "expensesController"}).
   when("/expenses/:id", {templateUrl: "partials/expenseEdit.html", controller: "expenseEditController"}).
   when("/features", {templateUrl: "partials/features.html"}).
