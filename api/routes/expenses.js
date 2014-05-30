@@ -31,6 +31,7 @@ router.get('/:username', function(req, res) {
   
   var db = req.db;
   db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+          try {
             if(docs.length == 1 && docs[0].username==req.params.username) {
                 db.get('expenses').find({ username: req.params.username },{}, function(e,docs){
                     res.json( docs );
@@ -38,6 +39,9 @@ router.get('/:username', function(req, res) {
             } else {
                 res.send(401);
             }
+         } catch (Exception) {
+           res.send(401);
+         }
         });
 });
 
@@ -52,6 +56,7 @@ router.get('/:username/:id', function(req, res) {
   
   var db = req.db;
   db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+          try {
             if(docs.length == 1 && docs[0].username==req.params.username) {
                 db.get('expenses').find({ username:req.params.username, _id:req.params.id },{}, function(e,docs){
                     res.json( docs );
@@ -59,6 +64,9 @@ router.get('/:username/:id', function(req, res) {
             } else {
                 res.send(401);
             }
+          } catch (Exception) {
+               res.send(401);
+          }
         });
 });
 
@@ -74,6 +82,7 @@ router.post('/:username', function(req, res) {
     var db = req.db;
     expense = req.body;
     db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+          try {
             if(docs.length == 1 && docs[0].username==req.params.username) {
                 expense.username = req.params.username;
                 db.get('expenses').insert(expense,{}, function(e,docs){
@@ -82,6 +91,9 @@ router.post('/:username', function(req, res) {
             } else {
                 res.send(401);
             }
+          } catch (Exception) {
+               res.send(401);
+          }            
         });
  
 });
@@ -98,23 +110,27 @@ router.put('/:username/:id', function(req, res) {
     
     var db = req.db;
     expense = req.body;
-    db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
-            if(docs.length == 1 && docs[0].username==req.params.username) {
-        expense.username = req.params.username;
+    try{
+      db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+        if(docs.length == 1 && docs[0].username==req.params.username) {
+          expense.username = req.params.username;
         
-        db.get('expenses').update({'_id':req.params.id}, expense, {safe:true}, function(err, result) {
-            if (err) {
-              console.log('Error updating expense: ' + err);
-              res.send(500);
-            } else {
-              console.log('' + result + ' document(s) updated');
-              res.send(expense);
-            }
-          });
-            } else {
-                res.send(401);
-            }
+          db.get('expenses').update({'_id':req.params.id}, expense, {safe:true}, function(err, result) {
+              if (err) {
+                console.log('Error updating expense: ' + err);
+                res.send(500);
+              } else {
+                console.log('' + result + ' document(s) updated');
+                res.send(expense);
+              }
+            });
+          } else {
+              res.send(401);
+          }
         });
+      } catch (Exception) {
+           res.send(401);
+      }
 });
 
 /* HTTP DELETE /expenses/:username/:id?auth_token=auth_token
@@ -129,6 +145,7 @@ router.delete('/:username/:id', function(req, res) {
     
     var db = req.db;
     expense = req.body;
+    try {
     db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
             if(docs.length == 1 && docs[0].username==req.params.username) {
         expense.username = req.params.username;
@@ -146,6 +163,9 @@ router.delete('/:username/:id', function(req, res) {
                 res.send(401);
             }
         });
+     } catch (Exception) {
+        res.send(401);
+     }
 });
 
 
