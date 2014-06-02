@@ -32,7 +32,7 @@ angular.module('ExpensesWebClient.services', []).
       expensesAPIservice.getExpenses = function(authToken) {
         return $http({
           method: 'GET', 
-          url: 'http://127.0.0.1:3000/expenses/nicola?auth_token=' + authToken
+          url: 'http://expensesapi.nicolacimmino.com/expenses/nicola?auth_token=' + authToken
         });
       }
 
@@ -40,7 +40,7 @@ angular.module('ExpensesWebClient.services', []).
     expensesAPIservice.getAuthToken = function(username, password) {
         return $http({
           method: 'POST', 
-          url: 'http://127.0.0.1:3000/users/'+username+'/auth_token',
+          url: 'http://expensesapi.nicolacimmino.com/users/'+username+'/auth_token',
       data: {
         password:password
       }
@@ -50,7 +50,7 @@ angular.module('ExpensesWebClient.services', []).
     expensesAPIservice.getExpense = function(authToken, id) {
         return $http({
           method: 'GET', 
-          url: 'http://127.0.0.1:3000/expenses/nicola/'+id+'?auth_token=' + authToken
+          url: 'http://expensesapi.nicolacimmino.com/expenses/nicola/'+id+'?auth_token=' + authToken
         });
     }
     
@@ -58,7 +58,7 @@ angular.module('ExpensesWebClient.services', []).
     expensesAPIservice.updateExpense = function(authToken,expense) {
         return $http({
           method: 'PUT', 
-          url: 'http://127.0.0.1:3000/expenses/nicola/'+expense._id+'?auth_token=' + authToken,
+          url: 'http://expensesapi.nicolacimmino.com/expenses/nicola/'+expense._id+'?auth_token=' + authToken,
           data: expense
         });
       }
