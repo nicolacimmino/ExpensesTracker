@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ExpensesReporter</string>
+    <string name="title_view_detail">view Detail</string>
+    <string name="title_activity_main">Expenses Reporter</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="default_currency">eur</string>
+    <string name="title_activity_expenses_list">Expenses</string>
+    <string name="action_show_expenses">Show Expenses</string>
+    <string name="source">Payment Method</string>
+    <string name="destination">Category</string>
+    <string name="notes">Notes</string>
+    <string name="amount">Amount</string>
+    <string name="amount_hint">0.00</string>
+    <string name="notes_hint">Notes (Optional)</string>
+    <string-array name="transaction_sources">
+        <item>Bank</item>
+        <item>Visa</item>
+        <item>Cash</item>
+        <item>Loan</item>
+        <item>Savings</item>
+        <item>Skrill</item>
+    </string-array>
+
+    <string-array name="transaction_destinations">
+        <item>Food</item>
+        <item>Home</item>
+        <item>Transport</item>
+        <item>Car</item>
+        <item>Phone</item>
+        <item>Clothing</item>
+        <item>Bank</item>
+        <item>Visa</item>
+        <item>Cash</item>
+        <item>Loan</item>
+        <item>Savings</item>
+        <item>Skrill</item>
+    </string-array>
+
+    <string name="error_amount">Secify an amount</string>
+    <string name="saved">Saved</string>
+    <string name="error_saving">Error saving data.</string>
+</resources>
