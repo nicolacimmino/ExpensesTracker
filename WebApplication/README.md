@@ -8,12 +8,12 @@ The application allows to log into the service, list available expenses and edit
 
 Below are few screenshots of the application.
 
-![Screenshot](https://raw.github.com/nicolacimmino/ExpensesWebClient/master/documentation/screenshot2.png)
+![Screenshot](https://raw.github.com/nicolacimmino/ExpensesTracker/master/WebApplication/documentation/screenshot2.png)
 
-![Screenshot](https://raw.github.com/nicolacimmino/ExpensesWebClient/master/documentation/screenshot.png)
+![Screenshot](https://raw.github.com/nicolacimmino/ExpensesTracker/master/WebApplication/documentation/screenshot.png)
 
 On a more narrow screen, such as on a mobile phone, the layout flows and adjusts to accomodate the screen size:
 
-![Screenshot](https://raw.github.com/nicolacimmino/ExpensesWebClient/master/documentation/screenshot3.png)
+![Screenshot](https://raw.github.com/nicolacimmino/ExpensesTracker/master/WebApplication/documentation/screenshot3.png)
 
 
