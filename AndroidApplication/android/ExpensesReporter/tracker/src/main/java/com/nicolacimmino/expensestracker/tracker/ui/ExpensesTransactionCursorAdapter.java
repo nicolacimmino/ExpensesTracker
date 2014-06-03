@@ -1,4 +1,4 @@
-/* ExpensesTransactionCursorAdapter is part of ExpensesReporter.
+/* ExpensesTransactionCursorAdapter is part of ExpensesTracker.
  * Based on the template included in AndroidStudio.
  *   Copyright (C) 2014 Nicola Cimmino
  *

@@ -1,4 +1,4 @@
-/* ExpensesListActivity is part of ExpensesReporter and displays a list of all expenses.
+/* ExpensesListActivity is part of ExpensesTracker and displays a list of all expenses.
  *   Copyright (C) 2014 Nicola Cimmino
  *
  *    This program is free software: you can redistribute it and/or modify

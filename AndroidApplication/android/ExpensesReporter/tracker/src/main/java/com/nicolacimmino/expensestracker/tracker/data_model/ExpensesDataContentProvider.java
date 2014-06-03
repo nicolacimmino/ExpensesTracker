@@ -1,4 +1,4 @@
-/* ExpensesDataContentProvider is part of ExpensesReporter is the expenses data provider.
+/* ExpensesDataContentProvider is part of Expensestracker is the expenses data provider.
  *   Copyright (C) 2014 Nicola Cimmino
  *
  *    This program is free software: you can redistribute it and/or modify

@@ -1,4 +1,4 @@
-/* ExpensesSQLiteHelper is part of ExpensesReporter and provides database access support.
+/* ExpensesSQLiteHelper is part of ExpensesTracker and provides database access support.
  *   Copyright (C) 2014 Nicola Cimmino
  *
  *    This program is free software: you can redistribute it and/or modify

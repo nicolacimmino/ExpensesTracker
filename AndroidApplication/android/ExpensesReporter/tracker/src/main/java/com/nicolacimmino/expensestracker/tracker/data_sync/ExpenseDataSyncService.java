@@ -1,4 +1,4 @@
-/* ExpenseDataSyncService is part of ExpensesReporter and is the sync service to sync data to
+/* ExpenseDataSyncService is part of ExpensesTracker and is the sync service to sync data to
  *   the server.
  *   Copyright (C) 2014 Nicola Cimmino
  *

@@ -1,4 +1,4 @@
-/* ExpenseDataAuthenticator is part of ExpensesReporter and is the account authenticator.
+/* ExpenseDataAuthenticator is part of ExpensesTracker and is the account authenticator.
  *   Copyright (C) 2014 Nicola Cimmino
  *
  *    This program is free software: you can redistribute it and/or modify
@@ -39,9 +39,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
 

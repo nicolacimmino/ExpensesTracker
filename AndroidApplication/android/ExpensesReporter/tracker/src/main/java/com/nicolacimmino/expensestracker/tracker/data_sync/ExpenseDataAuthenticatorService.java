@@ -1,4 +1,4 @@
-/* ExpenseDataAuthenticatorContract is part of ExpensesReporter.
+/* ExpenseDataAuthenticatorContract is part of ExpensesTracker.
  *   Copyright (C) 2014 Nicola Cimmino
  *
  *    This program is free software: you can redistribute it and/or modify

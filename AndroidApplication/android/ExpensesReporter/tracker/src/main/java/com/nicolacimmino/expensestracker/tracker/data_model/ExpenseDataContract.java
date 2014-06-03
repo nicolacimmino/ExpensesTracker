@@ -1,4 +1,4 @@
-/* ExpenseDataContract is part of ExpensesReporter and provides the expenses data provider contract.
+/* ExpenseDataContract is part of ExpensesTracker and provides the expenses data provider contract.
  *   Copyright (C) 2014 Nicola Cimmino
  *
  *    This program is free software: you can redistribute it and/or modify

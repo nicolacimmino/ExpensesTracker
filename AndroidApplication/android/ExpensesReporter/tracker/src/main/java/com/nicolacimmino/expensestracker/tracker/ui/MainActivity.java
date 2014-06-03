@@ -1,4 +1,4 @@
-/* MainActivity is part of ExpensesReporter and provides the expenses input interface.
+/* MainActivity is part of ExpensesTracker and provides the expenses input interface.
  *   Copyright (C) 2014 Nicola Cimmino
  *
  *    This program is free software: you can redistribute it and/or modify

@@ -1,4 +1,4 @@
-/* ExpenseDataSyncAdapter is part of ExpensesReporter and is the sync adapter to sync data to
+/* ExpenseDataSyncAdapter is part of ExpensesTracker and is the sync adapter to sync data to
  *   the server.
  *   Copyright (C) 2014 Nicola Cimmino
  *
@@ -37,9 +37,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /*
  * Sync adapter for Expense data.

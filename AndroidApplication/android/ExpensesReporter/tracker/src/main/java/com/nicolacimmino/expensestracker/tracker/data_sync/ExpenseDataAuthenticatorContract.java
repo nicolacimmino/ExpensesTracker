@@ -1,4 +1,4 @@
-/* ExpenseDataAuthenticatorContract is part of ExpensesReporter.
+/* ExpenseDataAuthenticatorContract is part of ExpensesTracker.
  *   Copyright (C) 2014 Nicola Cimmino
  *
  *    This program is free software: you can redistribute it and/or modify
@@ -21,6 +21,5 @@ package com.nicolacimmino.expensestracker.tracker.data_sync;
 public class ExpenseDataAuthenticatorContract {
 
     public static final String ACCOUNT_TYPE = "expenses.nicolacimmino.com";
-    public static final String ACCOUNT = "expensestracker";
     public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "expenses.nicolacimmino.com.full";
 }

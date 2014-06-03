@@ -1,4 +1,4 @@
-/* ExpenseDataLoginActivity is part of ExpensesReporter and provides the login interface.
+/* ExpenseDataLoginActivity is part of ExpensesTracker and provides the login interface.
  * Based on the template included in AndroidStudio.
  *   Copyright (C) 2014 Nicola Cimmino
  *
@@ -60,13 +60,6 @@ public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity imple
     public static final String ARG_IS_ADDING_NEW_ACCOUNT = "is_adding_new";
 
     /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
@@ -75,7 +68,6 @@ public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity imple
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
-    private View mEmailLoginFormView;
     private View mLoginFormView;
 
 
@@ -111,7 +103,6 @@ public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity imple
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        mEmailLoginFormView = findViewById(R.id.email_login_form);
     }
 
     private void populateAutoComplete() {
