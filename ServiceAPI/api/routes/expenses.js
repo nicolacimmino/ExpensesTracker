@@ -80,6 +80,7 @@ router.get('/:username/:id', function(req, res) {
 router.post('/:username', function(req, res) {
     
     var db = req.db;
+    console.log(req.body);
     expense = req.body;
     db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
           try {

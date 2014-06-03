@@ -65,22 +65,26 @@ router.post('/:username/auth_token', function(req, res) {
             // While we don't have the API to register a new user log the expected
             //    salted and hashed password so we can store it in db and login.
             //console.log(bcrypt.hashSync("bla", 10));
-            if(bcrypt.compareSync(req.body.password, docs[0].password)) {
-                    crypto.randomBytes(48, function(ex, buf) {
-                    db.get('auth_tokens').insert({
-                                'username':req.params.username,
-                                'auth_token': buf.toString('hex') 
-                                },
-                                function(err, doc) {
-                                    if(err) {
-                                        res.send(500);
-                                    } else {
-                                        res.json( { "auth_token": buf.toString('hex') } );
-                                    }
-                                });
-                });
-            } else {
-                res.send(401);
+            try {
+              if(bcrypt.compareSync(req.body.password, docs[0].password)) {
+                      crypto.randomBytes(48, function(ex, buf) {
+                      db.get('auth_tokens').insert({
+                                  'username':req.params.username,
+                                  'auth_token': buf.toString('hex') 
+                                  },
+                                  function(err, doc) {
+                                      if(err) {
+                                          res.send(500);
+                                      } else {
+                                          res.json( { "auth_token": buf.toString('hex') } );
+                                      }
+                                  });
+                  });
+              } else {
+                  res.send(401);
+              }
+            } catch (Exception) {
+                  res.send(401);
             }
         } else {
             res.send(404);
