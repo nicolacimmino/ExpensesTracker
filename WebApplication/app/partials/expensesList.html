@@ -1,20 +1,17 @@
-<p class="lead"> 
-<div class="ExpenseTable">
-<table>
-      <tr>
-      <td>Date</td>
-      <td>Method</td>
-      <td>Category</td>
-      <td>Amount</td>
-      <td>Notes</td>
-      </tr>
-      <tr ng-repeat="expense in expensesList | filter : searchFilter" ng-click="edit_expense(expense)">
-        <td>{{expense.timestamp}}</td>
-        <td>{{expense.from}}</td>
-        <td>{{expense.to}}</td>
-        <td>{{expense.amount}}</td>
-        <td>{{expense.notes}}</td>
-      </tr>
- </table>
- </div>
- </p>
+
+<table class="table table-striped table-condensed table-hover">
+  <tr>
+  <th>Date</th>
+  <th>Method</th>
+  <th>Category</th>
+  <th>Amount</th>
+  <th>Notes</th>
+  </tr>
+  <tr ng-repeat="expense in expensesList | filter : searchFilter" ng-click="edit_expense(expense)">
+    <td>{{expense.timestamp}}</td>
+    <td>{{expense.from}}</td>
+    <td>{{expense.to}}</td>
+    <td>{{expense.amount}}</td>
+    <td>{{expense.notes}}</td>
+  </tr>
+</table>
