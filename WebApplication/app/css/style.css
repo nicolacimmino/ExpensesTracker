@@ -14,3 +14,15 @@
 .hidden {
   display:node;
 }
+
+.background-green {
+  background-color:#dff0d8;
+}
+
+.background-red {
+  background-color:#f2dede;
+}
+
+.background-blue {
+  background-color:#d9edf7;
+}
