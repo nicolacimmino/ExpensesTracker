@@ -48,7 +48,7 @@
               <li class="divider"></li>
               <li><a href="#">Settings</a></li>
               <li class="divider"></li>
-              <li><a href="#">Logout</a></li>
+              <li ng-controller="loginController"><a ng-click="logOut()">Logout</a></li>
               </ul>
             </li>
             <li ng-class="menuClass('about')"><a href="#/about">About</a></li>

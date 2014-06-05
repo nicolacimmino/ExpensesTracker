@@ -31,9 +31,15 @@ angular.module('ExpensesWebClient.controllers', []).
     $location.path('/expenses');
     });
      };
+     
     $scope.loginFormClass = function() {
     return (SharedData.authToken != "") ? "hidden" : "visible";
     };
+    
+    $scope.logOut = function() {
+      SharedData.authToken = "";
+      $location.path('/');
+    }
   }).
   
   controller('expensesController', function($scope, $routeParams, $location, expensesAPIservice, SharedData) {
