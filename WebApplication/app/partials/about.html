@@ -1,4 +1,4 @@
-<div class="jumbotron">
+<div class="jumbotron bg-success">
   <div class="container">
     <div class="col-sm-8 text-justify">
     <h1>What is this?</h1>
@@ -17,26 +17,56 @@
 
 
   
-  <div class="col-sm-4">
-    <div class="jumbotron background-red text-justify">
-      <h2>Web Application</h2>
+  <div class="jumbotron">
+      <div class="container">
+      <div class="col-sm-3">
+      <img class="img-responsive" src="img/webapplication.png"></img>
+      </div>
+      <div class="col-sm-1">
+      &nbsp;
+      </div>
+      <div class="col-sm-8 text-justify">
+      <h1>Web Application</h1>
       The Web application is the one you are looking at right now. It's an <strong>SPA</strong> (Single Page Application) built in <strong>Angular.js</strong> and made nearly pretty with the help of <strong>Bootstrap CSS</strong>.
       The pages and the resources are served by a Node.js server, but just out of convenience, there is really no processing or access to data on the server side, we only serve static
       HTML, CSS and JavaScript, all processing is done on the client in Agular.
-    </div>
+      </div>
+      </div>
   </div>
-  <div class="col-sm-4">
-    <div class="jumbotron background-green">
-      <h2>API</h2>
+  
+  <div class="jumbotron">
+    <div class="container">
+      <div class="col-sm-8 text-justify">
+      <h1>API</h1>
       The Web Application interacts with the actual user data trough a <strong>HTTP ReSTful API</strong>. This is realized with a <strong>Node.js</strong> server using <strong>Express</strong> and <strong>Monk</strong>
       to access a <strong>MongoDB</strong>. The API allows the applications to authenticate a user and provides <strong>CRUD</strong> methods to manipulate single expenses belonging to one user. The same API
       is used by the Web Application and the Android Application.
+      </div>
+      <div class="col-sm-1">
+      &nbsp;
+      </div>
+      <div class="col-sm-3">
+      <img class="img-responsive" src="img/api.png"></img>
+      </div>
     </div>
   </div>
-  <div class="col-sm-4">
-    <div class="jumbotron background-blue">
-      Android
-    </div>
+  
+  <div class="jumbotron">
+      <div class="container">
+      <div class="col-sm-3">
+      <img class="img-responsive" src="img/android.png"></img>
+      </div>
+      <div class="col-sm-1">
+      &nbsp;
+      </div>
+      <div class="col-sm-8 text-justify">
+      <h1>Android</h1>
+      The Android application allows to easily report expenses while on the go. Its main interface is designed to be usable also when walking and using the phone single-handed. The application itself
+      dosen't offer much more than the ability to report new expenses. It's anyhow an interesting reference design for an Android application as it shows how to create <strong>Content Providers</strong> and 
+      <strong>Sync Adapters</strong> in order to perform background data sync in the most battery efficient way. It also demonstrates how to implement an <strong>Account Authenticator</strong> so that the 
+      user account is managed properly by Android. The application makes use of a <strong>SQLite</strong> database to store locally the data until it's sent over to the server trough the API.
+      </div>
+      </div>
   </div>
   
   
