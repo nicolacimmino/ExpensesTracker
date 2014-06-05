@@ -35,6 +35,8 @@ angular.module('ExpensesWebClient.controllers', []).
         }).
        error(function (response,status, headers, config) { 
         pageFree();
+        $('#login_password_label').toggleClass("text-danger",true);
+        $('#login_username_label').toggleClass("text-danger",true);
         });
      };
      
