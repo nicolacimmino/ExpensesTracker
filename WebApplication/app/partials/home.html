@@ -22,7 +22,7 @@
 		</div>
 	</div>
   
-    <div ng-class="loginFormClass()">
+    <div ng-class="loginFormVisibility()">
     <div class="jumbotron">
         <div class="container">
         <div class="col-md-6 container">
@@ -32,17 +32,22 @@
         </div>
         </div>
         <div class="col-md-6">
+        <form class="form-signin" id="login_form">
         <div class="form-group">
           <label for="login_usernname">Username</label>
-          <input type="text" ng-model="username" placeholder="Username" class="form-control" id="login_usernname">
+          <input type="text" ng-model="username" placeholder="Username" class="form-control" id="login_usernname" required autofocus>
         </div>
         <div class="form-group">
           <label for="login_password">Password</label>
-          <input type="password" ng-model="password" placeholder="Password" class="form-control" id="login_password">
+          <input type="password" ng-model="password" placeholder="Password" class="form-control" id="login_password" required>
         </div>
-        <input type="button" ng-click="login(username,password)" class="btn btn-success" value="Log in">
+        <br>
+        <input type="submit" ng-click="login(username,password)" class="btn btn-lg btn-success btn-block" value="Log in">
+        </form>
         </div>
         </div>
     </div> 
+  
     </div>
+  
   

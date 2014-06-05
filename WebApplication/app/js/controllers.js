@@ -26,14 +26,20 @@ angular.module('ExpensesWebClient.controllers', []).
        
   // Asyncronously fetch the auth token from the API and report it to the scope.
     $scope.login = function (username, password) {
-    expensesAPIservice.getAuthToken(username, password).success(function (response,status, headers, config) {
+      pageBusy();
+      expensesAPIservice.getAuthToken(username, password).
+       success(function (response,status, headers, config) {
         SharedData.authToken = response.auth_token;
-    $location.path('/expenses');
-    });
+        $location.path('/expenses');
+        pageFree();
+        }).
+       error(function (response,status, headers, config) { 
+        pageFree();
+        });
      };
      
-    $scope.loginFormClass = function() {
-    return (SharedData.authToken != "") ? "hidden" : "visible";
+    $scope.loginFormVisibility = function() {
+    return (SharedData.authToken != "") ? "hidden" : "show";
     };
     
     $scope.logOut = function() {
@@ -52,30 +58,36 @@ angular.module('ExpensesWebClient.controllers', []).
   
   // Asyncronously fetch expenses from the API and report them to the scope.
   if(SharedData.authToken!="") {
+    pageBusy();
     expensesAPIservice.getExpenses(SharedData.authToken).success(function (response,status, headers, config) {
       $scope.expensesList = response;
+      pageFree();
     });  
   } else {
-    $location.path('/login');
+    $location.path('/');
   }
   }).
   
   controller('expenseEditController', function($scope, $location, $routeParams, expensesAPIservice, SharedData) {
   
   if(SharedData.authToken!='' && $routeParams.id!="") {
+    pageBusy();
     expensesAPIservice.getExpense(SharedData.authToken,$routeParams.id).success(function (response, status, headers, config) {
       $scope.expense = response[0];
+      pageFree();
       });
       
    $scope.updateExpense = function() {
+    pageBusy();
     expensesAPIservice.updateExpense(SharedData.authToken, $scope.expense).success(function (response, status, headers, config) {
       $location.path('/expenses');
+      pageFree();
       })
    }
   }
   else
   {
-    $location.path('/login');
+    $location.path('/');
   }
   }).
   

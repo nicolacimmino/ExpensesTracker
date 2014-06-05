@@ -7,13 +7,6 @@
   background-color: #FF9900;
 }
 
-.visible {
-  display:block;
-}
-
-.hidden {
-  display:node;
-}
 
 .background-green {
   background-color:#dff0d8;
