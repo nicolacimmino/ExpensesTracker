@@ -1,4 +1,4 @@
-/* app.js is part of Expenses API and is bootstraps the application.
+/* app.js is part of Expenses API and bootstraps the application.
  *
  *   Copyright (C) 2014 Nicola Cimmino
  *
