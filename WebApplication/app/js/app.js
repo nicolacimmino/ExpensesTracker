@@ -23,8 +23,9 @@
 angular.module('ExpensesWebClient', [
   'ExpensesWebClient.controllers',
   'ExpensesWebClient.services',
-  'ngRoute'
-]).
+  'ngRoute',
+  'LocalStorageModule'
+  ]).
 config(['$routeProvider', function($routeProvider) {
   $routeProvider.
   when("/home", {templateUrl: "partials/home.html", controller: "loginController"}).
@@ -34,6 +35,6 @@ config(['$routeProvider', function($routeProvider) {
   when("/contact", {templateUrl: "partials/contact.html"}).
   otherwise({redirectTo: '/home'});
 }]).
-factory('SharedData', function() {
-    return { authToken:"" };
-});
+factory('SharedData', ['localStorageService', function(localStorageService) {
+    return { authToken: localStorageService.get('auth_token') || '' };
+}]);

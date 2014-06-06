@@ -22,7 +22,7 @@
 // This controller is responsible to provide expenses data to the scope.
 angular.module('ExpensesWebClient.controllers', []).
  
-  controller('loginController', function($scope, $location, expensesAPIservice, SharedData) {
+  controller('loginController', function($scope, $location, expensesAPIservice, SharedData, localStorageService) {
        
   // Asyncronously fetch the auth token from the API and report it to the scope.
     $scope.login = function (username, password) {
@@ -30,6 +30,7 @@ angular.module('ExpensesWebClient.controllers', []).
       expensesAPIservice.getAuthToken(username, password).
        success(function (response,status, headers, config) {
         SharedData.authToken = response.auth_token;
+        localStorageService.set('auth_token', response.auth_token);
         $location.path('/expenses');
         pageFree();
         }).
@@ -46,6 +47,7 @@ angular.module('ExpensesWebClient.controllers', []).
     
     $scope.logOut = function() {
       SharedData.authToken = "";
+      localStorageService.set('auth_token', "");
       $location.path('/');
     }
   }).
