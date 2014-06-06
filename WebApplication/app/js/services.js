@@ -63,5 +63,21 @@ angular.module('ExpensesWebClient.services', []).
         });
       }
       
+     // Careate an expense.
+    expensesAPIservice.createExpense = function(authToken,expense) {
+        return $http({
+          method: 'POST', 
+          url: 'http://expensesapi.nicolacimmino.com/expenses/nicola/?auth_token=' + authToken,
+          data: expense
+        });
+      }
+      
+    // Delete an expense.
+    expensesAPIservice.deleteExpense = function(authToken,expense) {
+        return $http({
+          method: 'DELETE', 
+          url: 'http://expensesapi.nicolacimmino.com/expenses/nicola/'+expense._id+'?auth_token=' + authToken
+        });
+      }  
     return expensesAPIservice;
   });

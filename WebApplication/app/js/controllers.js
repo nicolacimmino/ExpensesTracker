@@ -58,6 +58,12 @@ angular.module('ExpensesWebClient.controllers', []).
     $location.path("/expenses/"+expense._id);
   };
   
+  $scope.add_expense = function() {
+    pageBusy();
+    $location.path("/expenses/0");
+    pageFree();
+   }
+   
   // Asyncronously fetch expenses from the API and report them to the scope.
   if(SharedData.authToken!="") {
     pageBusy();
@@ -74,18 +80,48 @@ angular.module('ExpensesWebClient.controllers', []).
   
   if(SharedData.authToken!='' && $routeParams.id!="") {
     pageBusy();
-    expensesAPIservice.getExpense(SharedData.authToken,$routeParams.id).success(function (response, status, headers, config) {
-      $scope.expense = response[0];
+    
+    if($routeParams.id != 0) {
+      expensesAPIservice.getExpense(SharedData.authToken,$routeParams.id).success(function (response, status, headers, config) {
+        $scope.expense = response[0];
+        $scope.expense.isnew = false;
+        pageFree();
+        });
+    } else {
+      $scope.expense = {};
+      $scope.expense.amount = "0";
+      var today = new Date();
+      $scope.expense.timestamp = today.toISOString().replace('T',' ').replace('Z','');
+      $scope.expense.timestamp = $scope.expense.timestamp.substr(0, $scope.expense.timestamp.indexOf('.'));
+      $scope.expense.isnew = true;
       pageFree();
-      });
       
+    }
+    
    $scope.updateExpense = function() {
     pageBusy();
-    expensesAPIservice.updateExpense(SharedData.authToken, $scope.expense).success(function (response, status, headers, config) {
+    if($scope.expense.isnew === true) {
+      expensesAPIservice.createExpense(SharedData.authToken, $scope.expense).success(function (response, status, headers, config) {
+        $location.path('/expenses');
+        pageFree();
+        })
+    } else {
+      expensesAPIservice.updateExpense(SharedData.authToken, $scope.expense).success(function (response, status, headers, config) {
+        $location.path('/expenses');
+        pageFree();
+        })    
+    }
+   }
+   
+   $scope.deleteExpense = function() {
+    pageBusy();
+    expensesAPIservice.deleteExpense(SharedData.authToken, $scope.expense).success(function (response, status, headers, config) {
       $location.path('/expenses');
       pageFree();
       })
    }
+   
+   
   }
   else
   {
