@@ -78,6 +78,15 @@ angular.module('ExpensesWebClient.services', ['LocalStorageModule']).
           method: 'DELETE', 
           url: 'http://expensesapi.nicolacimmino.com/expenses/'+ localStorageService.get('username') + '/'+expense._id+'?auth_token=' + authToken
         });
-      }  
+      }
+
+    // Get all acounts.
+    expensesAPIservice.getAccounts = function(authToken) {
+        return $http({
+          method: 'GET', 
+          url: 'http://expensesapi.nicolacimmino.com/accounts/' + localStorageService.get('username') + '?filter=visa,bank,cash&auth_token=' + authToken
+        });
+      }
+      
     return expensesAPIservice;
   });

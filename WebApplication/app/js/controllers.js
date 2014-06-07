@@ -141,6 +141,21 @@ angular.module('ExpensesWebClient.controllers', []).
     }
     return page === current ? "active" : "";
   };
-});
+}).
+
+controller('accountsListController', function($scope, $location, expensesAPIservice, localStorageService) {
+       
+  // Asyncronously fetch accounts from the API and report them to the scope.
+  if(localStorageService.get('auth_token')) {
+    pageBusy();
+    expensesAPIservice.getAccounts(localStorageService.get('auth_token')).success(function (response,status, headers, config) {
+      $scope.accountsList = response;
+      pageFree();
+    });  
+  } else {
+    $location.path('/');
+  }
+  
+  });
   
   

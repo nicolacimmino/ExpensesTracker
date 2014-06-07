@@ -36,7 +36,7 @@ router.get('/:username', function(req, res) {
   db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
       if(docs.length == 1 && docs[0].username==req.params.username) {
           try {
-            if(true /*docs.length == 1 && docs[0].username==req.params.username*/) {
+            if(docs.length == 1 && docs[0].username==req.params.username) {
                 // Expenses transactions are booked as source,destination,amount. Each account balance is the
                 //  sum of the amounts where that account was the destination minus the sum of
                 //  the amounts where that account was the source. We make that calculation here using
@@ -49,12 +49,28 @@ router.get('/:username', function(req, res) {
                 //     amounts saved.
                 db.collection('transactions').mapReduce(
                   function() {                                                                          // Mapping function
-                    if(accountsFilter.indexOf(this.source) > -1) { emit(this.source, -this.amount) };
-                    if(accountsFilter.indexOf(this.destination) > -1) { emit(this.destination, this.amount); }      
+                    if(accountsFilter.indexOf(this.from.toLowerCase()) > -1) { 
+                      emit(this.from, -this.amount) 
+                    };
+                    if(accountsFilter.indexOf(this.to.toLowerCase()) > -1) { 
+                      emit(this.to, this.amount); 
+                    }      
                   },    
-                  function(account, amounts) { return Array.sum(amounts); },                            // Reduction function
-                  { out : { inline : 1}, scope: { accountsFilter:accountsFilter} },                     // Options
-                  function(e,docs, stats){ res.send( docs ); }                                          // Callback
+                  function(account, amounts) {                                                          // Reduction function
+                    return Array.sum(amounts); 
+                  },                            
+                  {                                                                                     // Options
+                    out : { inline : 1}, 
+                    scope: { accountsFilter:accountsFilter}, 
+                    query: { username:req.params.username} 
+                  },        
+                  function(e,docs, stats){                                                              // Callback
+                    try {
+                      res.send( docs ); 
+                    } catch (err) {
+                      res.send(501);
+                    }
+                  }                                          
                 );
             } else {
                 res.send(401);

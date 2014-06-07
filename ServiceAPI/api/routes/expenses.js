@@ -89,6 +89,7 @@ router.post('/:username', function(req, res) {
           try {
             if(docs.length == 1 && docs[0].username==req.params.username) {
                 expense.username = req.params.username;
+                expense.amount = parseFloat(expense.amount.replace('"',''));
                 db.collection('transactions').insert(expense,{}, function(e,docs){
                     res.send(200);
                 });
