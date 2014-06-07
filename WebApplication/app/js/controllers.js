@@ -66,7 +66,7 @@ angular.module('ExpensesWebClient.controllers', []).
    }
    
   // Asyncronously fetch expenses from the API and report them to the scope.
-  if(localStorageService.get('auth_token')!="") {
+  if(localStorageService.get('auth_token')) {
     pageBusy();
     expensesAPIservice.getExpenses(localStorageService.get('auth_token')).success(function (response,status, headers, config) {
       $scope.expensesList = response;
@@ -79,7 +79,7 @@ angular.module('ExpensesWebClient.controllers', []).
   
   controller('expenseEditController', function($scope, $location, $routeParams, expensesAPIservice, localStorageService) {
   
-  if(localStorageService.get('auth_token')!='' && $routeParams.id!="") {
+  if(localStorageService.get('auth_token') && $routeParams.id) {
     pageBusy();
     
     if($routeParams.id != 0) {
@@ -132,9 +132,13 @@ angular.module('ExpensesWebClient.controllers', []).
   }
   }).
   
-  controller("NavigationController", function($scope, $location) {
+  controller("NavigationController", function($scope, $location, localStorageService) {
   $scope.menuClass = function(page) {
     var current = $location.path().substring(1);
+    if(page=="expenses" && !localStorageService.get('auth_token'))
+    {
+      return "hidden";
+    }
     return page === current ? "active" : "";
   };
 });
