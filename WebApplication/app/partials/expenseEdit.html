@@ -3,25 +3,27 @@
   &nbsp;
 </div>
 <div class="col-md-4">
+  <form class="form-signin" id="expense_edit_form">
   <div class="form-group">   
     <label for="expense_from">Method</label> 
-    <input type="text" ng-model="expense.from" class="form-control" id="expense_from">
+    <input type="text" ng-model="expense.from" class="form-control" id="expense_from" placeholder="How did you pay? (Visa, chash...)" required autofocus>
   </div>
   <div class="form-group">    
     <label for="expense_to">Type</label> 
-    <input type="text" ng-model="expense.to" class="form-control" id="expense_to">
+    <input type="text" ng-model="expense.to" class="form-control" id="expense_to"  placeholder="Expense type (food, home...)" required>
   </div>
   <div class="form-group">    
     <label for="expense_amount">Amount</label>
-    <input type="text" ng-model="expense.amount" class="form-control" id="expense_amount">
+    <input type="text" ng-model="expense.amount" class="form-control" id="expense_amount" placeholder="Transaction amount" required>
   </div>
   <div class="form-group">    
     <label for="expense_notes">Notes</label>
-    <input type="text" ng-model="expense.notes" class="form-control" id="expense_notes">
+    <input type="text" ng-model="expense.notes" class="form-control" id="expense_notes" placeholder="Notes on the trascation (optional)">
   </div>
-  <input type="button" ng-click="updateExpense()" class="btn btn-success" value="Update">
-  <a  href="#/expenses" class="btn btn-danger">Cancel</a>
-  <input type="button" ng-click="deleteExpense()" class="btn btn-success" value="Delete">
+  <input type="submit" ng-click="updateExpense()" class="btn btn-success" value="Update" id="edit_form_action_button">
+  <a  href="#/expenses" class="btn btn-warning">Cancel</a>
+  <input type="button" ng-click="deleteExpense()" class="btn btn-danger" value="Delete" id="edit_form_delete_button">
+  </form>
 </div>
 <div class="col-md-4">
   &nbsp;

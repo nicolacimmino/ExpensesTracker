@@ -22,8 +22,8 @@
 // Note that the API has CORS enabled so we don't need to use
 //  JSOND on the client side to circumvent the same origin policy. 
 //
-angular.module('ExpensesWebClient.services', []).
-  factory('expensesAPIservice', function($http) {
+angular.module('ExpensesWebClient.services', ['LocalStorageModule']).
+  factory('expensesAPIservice', function($http, localStorageService) {
 
     var expensesAPIservice = {};
 
@@ -32,7 +32,7 @@ angular.module('ExpensesWebClient.services', []).
       expensesAPIservice.getExpenses = function(authToken) {
         return $http({
           method: 'GET', 
-          url: 'http://expensesapi.nicolacimmino.com/expenses/nicola?auth_token=' + authToken
+          url: 'http://expensesapi.nicolacimmino.com/expenses/' + localStorageService.get('username') + '?auth_token=' + authToken
         });
       }
 
@@ -50,7 +50,7 @@ angular.module('ExpensesWebClient.services', []).
     expensesAPIservice.getExpense = function(authToken, id) {
         return $http({
           method: 'GET', 
-          url: 'http://expensesapi.nicolacimmino.com/expenses/nicola/'+id+'?auth_token=' + authToken
+          url: 'http://expensesapi.nicolacimmino.com/expenses/' + localStorageService.get('username') + '/'+id+'?auth_token=' + authToken
         });
     }
     
@@ -58,7 +58,7 @@ angular.module('ExpensesWebClient.services', []).
     expensesAPIservice.updateExpense = function(authToken,expense) {
         return $http({
           method: 'PUT', 
-          url: 'http://expensesapi.nicolacimmino.com/expenses/nicola/'+expense._id+'?auth_token=' + authToken,
+          url: 'http://expensesapi.nicolacimmino.com/expenses/' + localStorageService.get('username') +  '/'+expense._id+'?auth_token=' + authToken,
           data: expense
         });
       }
@@ -67,7 +67,7 @@ angular.module('ExpensesWebClient.services', []).
     expensesAPIservice.createExpense = function(authToken,expense) {
         return $http({
           method: 'POST', 
-          url: 'http://expensesapi.nicolacimmino.com/expenses/nicola/?auth_token=' + authToken,
+          url: 'http://expensesapi.nicolacimmino.com/expenses/' + localStorageService.get('username') +  '/?auth_token=' + authToken,
           data: expense
         });
       }
@@ -76,7 +76,7 @@ angular.module('ExpensesWebClient.services', []).
     expensesAPIservice.deleteExpense = function(authToken,expense) {
         return $http({
           method: 'DELETE', 
-          url: 'http://expensesapi.nicolacimmino.com/expenses/nicola/'+expense._id+'?auth_token=' + authToken
+          url: 'http://expensesapi.nicolacimmino.com/expenses/'+ localStorageService.get('username') + '/'+expense._id+'?auth_token=' + authToken
         });
       }  
     return expensesAPIservice;

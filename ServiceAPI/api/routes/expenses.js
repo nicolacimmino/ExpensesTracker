@@ -82,6 +82,7 @@ router.post('/:username', function(req, res) {
     var db = req.db;
     console.log(req.body);
     expense = req.body;
+    try {
     db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
           try {
             if(docs.length == 1 && docs[0].username==req.params.username) {
@@ -96,7 +97,9 @@ router.post('/:username', function(req, res) {
                res.send(401);
           }            
         });
- 
+    } catch (Exception) {
+      res.send(401);
+    }
 });
 
 /* HTTP PUT /expenses/:username/:id?auth_token=auth_token
@@ -114,17 +117,21 @@ router.put('/:username/:id', function(req, res) {
     try{
       db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
         if(docs.length == 1 && docs[0].username==req.params.username) {
-          expense.username = req.params.username;
-        
-          db.get('expenses').update({'_id':req.params.id}, expense, {safe:true}, function(err, result) {
-              if (err) {
-                console.log('Error updating expense: ' + err);
-                res.send(500);
-              } else {
-                console.log('' + result + ' document(s) updated');
-                res.send(expense);
-              }
-            });
+            try {
+            expense.username = req.params.username;
+          
+            db.get('expenses').update({'_id':req.params.id}, expense, {safe:true}, function(err, result) {
+                if (err) {
+                  console.log('Error updating expense: ' + err);
+                  res.send(500);
+                } else {
+                  console.log('' + result + ' document(s) updated');
+                  res.send(expense);
+                }
+              });
+            } catch (Exception) {
+              res.send(401);
+            }
           } else {
               res.send(401);
           }

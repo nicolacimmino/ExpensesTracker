@@ -34,7 +34,4 @@ config(['$routeProvider', function($routeProvider) {
   when("/about", {templateUrl: "partials/about.html"}).
   when("/contact", {templateUrl: "partials/contact.html"}).
   otherwise({redirectTo: '/home'});
-}]).
-factory('SharedData', ['localStorageService', function(localStorageService) {
-    return { authToken: localStorageService.get('auth_token') || '' };
 }]);

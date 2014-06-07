@@ -22,14 +22,14 @@
 // This controller is responsible to provide expenses data to the scope.
 angular.module('ExpensesWebClient.controllers', []).
  
-  controller('loginController', function($scope, $location, expensesAPIservice, SharedData, localStorageService) {
+  controller('loginController', function($scope, $location, expensesAPIservice, localStorageService) {
        
   // Asyncronously fetch the auth token from the API and report it to the scope.
     $scope.login = function (username, password) {
       pageBusy();
+      localStorageService.set('username', username);
       expensesAPIservice.getAuthToken(username, password).
        success(function (response,status, headers, config) {
-        SharedData.authToken = response.auth_token;
         localStorageService.set('auth_token', response.auth_token);
         $location.path('/expenses');
         pageFree();
@@ -42,17 +42,16 @@ angular.module('ExpensesWebClient.controllers', []).
      };
      
     $scope.loginFormVisibility = function() {
-    return (SharedData.authToken != "") ? "hidden" : "show";
+      return (localStorageService.get('auth_token')) ? "hidden" : "show";
     };
     
     $scope.logOut = function() {
-      SharedData.authToken = "";
-      localStorageService.set('auth_token', "");
+      localStorageService.set('auth_token', '');
       $location.path('/');
     }
   }).
   
-  controller('expensesController', function($scope, $routeParams, $location, expensesAPIservice, SharedData) {
+  controller('expensesController', function($scope, $routeParams, $location, expensesAPIservice, localStorageService) {
     
   $scope.expensesList = [];
    
@@ -67,9 +66,9 @@ angular.module('ExpensesWebClient.controllers', []).
    }
    
   // Asyncronously fetch expenses from the API and report them to the scope.
-  if(SharedData.authToken!="") {
+  if(localStorageService.get('auth_token')!="") {
     pageBusy();
-    expensesAPIservice.getExpenses(SharedData.authToken).success(function (response,status, headers, config) {
+    expensesAPIservice.getExpenses(localStorageService.get('auth_token')).success(function (response,status, headers, config) {
       $scope.expensesList = response;
       pageFree();
     });  
@@ -78,13 +77,13 @@ angular.module('ExpensesWebClient.controllers', []).
   }
   }).
   
-  controller('expenseEditController', function($scope, $location, $routeParams, expensesAPIservice, SharedData) {
+  controller('expenseEditController', function($scope, $location, $routeParams, expensesAPIservice, localStorageService) {
   
-  if(SharedData.authToken!='' && $routeParams.id!="") {
+  if(localStorageService.get('auth_token')!='' && $routeParams.id!="") {
     pageBusy();
     
     if($routeParams.id != 0) {
-      expensesAPIservice.getExpense(SharedData.authToken,$routeParams.id).success(function (response, status, headers, config) {
+      expensesAPIservice.getExpense(localStorageService.get('auth_token'),$routeParams.id).success(function (response, status, headers, config) {
         $scope.expense = response[0];
         $scope.expense.isnew = false;
         pageFree();
@@ -96,6 +95,8 @@ angular.module('ExpensesWebClient.controllers', []).
       $scope.expense.timestamp = today.toISOString().replace('T',' ').replace('Z','');
       $scope.expense.timestamp = $scope.expense.timestamp.substr(0, $scope.expense.timestamp.indexOf('.'));
       $scope.expense.isnew = true;
+      $('#edit_form_action_button').val("Add");
+      $('#edit_form_delete_button').hide();
       pageFree();
       
     }
@@ -103,12 +104,12 @@ angular.module('ExpensesWebClient.controllers', []).
    $scope.updateExpense = function() {
     pageBusy();
     if($scope.expense.isnew === true) {
-      expensesAPIservice.createExpense(SharedData.authToken, $scope.expense).success(function (response, status, headers, config) {
+      expensesAPIservice.createExpense(localStorageService.get('auth_token'), $scope.expense).success(function (response, status, headers, config) {
         $location.path('/expenses');
         pageFree();
         })
     } else {
-      expensesAPIservice.updateExpense(SharedData.authToken, $scope.expense).success(function (response, status, headers, config) {
+      expensesAPIservice.updateExpense(localStorageService.get('auth_token'), $scope.expense).success(function (response, status, headers, config) {
         $location.path('/expenses');
         pageFree();
         })    
@@ -117,7 +118,7 @@ angular.module('ExpensesWebClient.controllers', []).
    
    $scope.deleteExpense = function() {
     pageBusy();
-    expensesAPIservice.deleteExpense(SharedData.authToken, $scope.expense).success(function (response, status, headers, config) {
+    expensesAPIservice.deleteExpense(localStorageService.get('auth_token'), $scope.expense).success(function (response, status, headers, config) {
       $location.path('/expenses');
       pageFree();
       })
