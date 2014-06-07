@@ -18,11 +18,11 @@
  */
  
 // Mongo database connection
-// We make use of monk as it provides usability improvemnts over mongodb.
-// See https://www.npmjs.org/package/monk for info and documentation.
+// We make use of mongojs as it provides usability improvemnts over mongodb.
+// See https://www.npmjs.org/package/mongojs for info and documentation.
 var mongo = require('mongodb');
-var monk = require('monk');
-var db = monk('localhost:27017/expenses');
+var mongojs = require('mongojs');
+var db = mongojs('expenses');
 
 // We use path to build some static referneces to local folders below.
 var path = require('path');
@@ -83,10 +83,11 @@ app.use(function(req,res,next){
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var expenses = require('./routes/expenses');
+var accounts = require('./routes/accounts');
 app.use('/', routes);
 app.use('/users', users);
 app.use('/expenses', expenses);
-
+app.use('/accounts', accounts);
 
 // As mentioned above the middleware injected  is executed in the order in which it's injected
 // so this goes at the end of the chain and will  set the response code to 404 (not found) as none
@@ -103,7 +104,7 @@ app.use(function(req, res, next) {
 
 
 // And last in the chain we inject the error handler.
-// This has a four parameter signature. We give a genric  500 (internal server error) unless 
+// This has a four parameter signature. We give a generic  500 (internal server error) unless 
 // a specific error  was already set.
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);

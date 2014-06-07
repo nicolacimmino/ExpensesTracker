@@ -20,6 +20,7 @@
 
 var express = require('express');
 var router = express.Router();
+var ObjectId = require('mongodb').ObjectID;
 
 /* HTTP GET /expenses/:username?auth_token=auth_token
  * Param username: the username of the user.
@@ -30,10 +31,10 @@ var router = express.Router();
 router.get('/:username', function(req, res) {
   
   var db = req.db;
-  db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+  db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
           try {
             if(docs.length == 1 && docs[0].username==req.params.username) {
-                db.get('expenses').find({ username: req.params.username },{}, function(e,docs){
+                db.collection('transactions').find({ username: req.params.username },{}, function(e,docs){
                     res.json( docs );
                 });
             } else {
@@ -55,16 +56,17 @@ router.get('/:username', function(req, res) {
 router.get('/:username/:id', function(req, res) {
   
   var db = req.db;
-  db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+  db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
           try {
             if(docs.length == 1 && docs[0].username==req.params.username) {
-                db.get('expenses').find({ username:req.params.username, _id:req.params.id },{}, function(e,docs){
+                db.collection('transactions').find({ username:req.params.username, _id:new ObjectId(req.params.id) },{}, function(e,docs){
                     res.json( docs );
                 });
             } else {
                 res.send(401);
             }
           } catch (Exception) {
+               console.log(Exception);
                res.send(401);
           }
         });
@@ -83,11 +85,11 @@ router.post('/:username', function(req, res) {
     console.log(req.body);
     expense = req.body;
     try {
-    db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+    db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
           try {
             if(docs.length == 1 && docs[0].username==req.params.username) {
                 expense.username = req.params.username;
-                db.get('expenses').insert(expense,{}, function(e,docs){
+                db.collection('transactions').insert(expense,{}, function(e,docs){
                     res.send(200);
                 });
             } else {
@@ -115,12 +117,12 @@ router.put('/:username/:id', function(req, res) {
     var db = req.db;
     expense = req.body;
     try{
-      db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+      db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
         if(docs.length == 1 && docs[0].username==req.params.username) {
             try {
             expense.username = req.params.username;
-          
-            db.get('expenses').update({'_id':req.params.id}, expense, {safe:true}, function(err, result) {
+            expense._id = new ObjectId(req.params.id);
+            db.collection('transactions').update({'_id':new ObjectId(req.params.id)}, expense, {safe:true}, function(err, result) {
                 if (err) {
                   console.log('Error updating expense: ' + err);
                   res.send(500);
@@ -154,11 +156,11 @@ router.delete('/:username/:id', function(req, res) {
     var db = req.db;
     expense = req.body;
     try {
-    db.get('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+    db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
             if(docs.length == 1 && docs[0].username==req.params.username) {
         expense.username = req.params.username;
         
-        db.get('expenses').remove({'_id':req.params.id}, {safe:true}, function(err, result) {
+        db.collection('transactions').remove({'_id':new ObjectId(req.params.id)}, {safe:true}, function(err, result) {
             if (err) {
               console.log('Error deleting expense: ' + err);
               res.send(500);

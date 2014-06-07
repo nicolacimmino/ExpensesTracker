@@ -39,7 +39,7 @@ router.get('/', function(req, res) {
 router.get('/:username', function(req, res) {
   
   var db = req.db;
-    db.get('users').find({ username: req.params.username },{}, function(e,docs){
+    db.collection('users').find({ username: req.params.username },{}, function(e,docs){
         if(docs.length == 1) {
             res.json( { "username": docs[0].username } );
         } else {
@@ -60,7 +60,7 @@ router.get('/:username', function(req, res) {
 router.post('/:username/auth_token', function(req, res) {
   
     var db = req.db;
-    db.get('users').find({ username: req.params.username },{}, function(e,docs){
+    db.collection('users').find({ username: req.params.username },{}, function(e,docs){
         if(docs.length == 1) {
             // While we don't have the API to register a new user log the expected
             //    salted and hashed password so we can store it in db and login.
@@ -68,7 +68,7 @@ router.post('/:username/auth_token', function(req, res) {
             try {
               if(bcrypt.compareSync(req.body.password, docs[0].password)) {
                       crypto.randomBytes(48, function(ex, buf) {
-                      db.get('auth_tokens').insert({
+                      db.collection('auth_tokens').insert({
                                   'username':req.params.username,
                                   'auth_token': buf.toString('hex') 
                                   },
