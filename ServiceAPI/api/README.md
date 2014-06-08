@@ -15,7 +15,7 @@ API
 
 Creates an autentication token that can be used to later access other parts of the API. 
 
-    curl -i -X POST 127.0.0.1:3000/users/nicola/auth_token --data "{\"username\":\"guest\", \"password\":\"guest\"}" -H "Content-Type: application/json"
+`curl -i -X POST 127.0.0.1:3000/users/nicola/auth_token --data "{\"username\":\"guest\", \"password\":\"guest\"}" -H "Content-Type: application/json"`
 
 
 
