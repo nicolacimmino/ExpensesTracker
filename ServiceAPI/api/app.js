@@ -77,6 +77,9 @@ app.use(function(req,res,next){
     next();
 });
 
+var authentication = require('./accessControl.js');
+authentication.use(db);
+
 // We finally inject our modules.
 // Note that in this case when invoking  app.use() we pass a partial URL as first
 // parameter so we tell Express which modules  to use according to the reuested URL.

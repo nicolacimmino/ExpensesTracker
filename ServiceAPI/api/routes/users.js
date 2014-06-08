@@ -18,37 +18,9 @@
  *
 */
 
-
 var express = require('express');
 var router = express.Router();
-var bcrypt = require('bcrypt');
-var crypto = require('crypto');
-
-/* GET users listing. 
- * We do not allow users listing. Deny.
- */
-router.get('/', function(req, res) {
-  res.json({"error":"Not allowed"});
-});
-
-/* HTTP GET /users/:username
- * Param username: the username of the user.
- * Returns: the specified user information.
- * Error: 404 if the specified user doesn't exist.
- */
-router.get('/:username', function(req, res) {
-  
-  var db = req.db;
-    db.collection('users').find({ username: req.params.username },{}, function(e,docs){
-        if(docs.length == 1) {
-            res.json( { "username": docs[0].username } );
-        } else {
-            res.send(404);
-        }
-    });
-    
-});
-
+var accessControl = require('../accessControl.js');
 
 /* HTTP POST /users/:username/auth_token
  * POST data: username and password
@@ -58,39 +30,18 @@ router.get('/:username', function(req, res) {
  * Error: 401 if the suppliced username/password don't match.
  */
 router.post('/:username/auth_token', function(req, res) {
+
+  var username = req.params.username;
+  var password = req.body.password;
   
-    var db = req.db;
-    db.collection('users').find({ username: req.params.username },{}, function(e,docs){
-        if(docs.length == 1) {
-            // While we don't have the API to register a new user log the expected
-            //    salted and hashed password so we can store it in db and login.
-            //console.log(bcrypt.hashSync("bla", 10));
-            try {
-              if(bcrypt.compareSync(req.body.password, docs[0].password)) {
-                      crypto.randomBytes(48, function(ex, buf) {
-                      db.collection('auth_tokens').insert({
-                                  'username':req.params.username,
-                                  'auth_token': buf.toString('hex') 
-                                  },
-                                  function(err, doc) {
-                                      if(err) {
-                                          res.send(500);
-                                      } else {
-                                          res.json( { "auth_token": buf.toString('hex') } );
-                                      }
-                                  });
-                  });
-              } else {
-                  res.send(401);
-              }
-            } catch (Exception) {
-                  res.send(401);
-            }
-        } else {
-            res.send(404);
-        }
-    });
-    
+  accessControl.getAuthToken(username, password, 
+      function onAllowed(auth_token) {
+        res.json(auth_token);
+      },
+      function onDenied() {
+        res.send(401);
+      });
+  
 });
 
 module.exports = router;

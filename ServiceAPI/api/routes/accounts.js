@@ -20,6 +20,7 @@
 
 var express = require('express');
 var router = express.Router();
+var accessControl = require('../accessControl.js');
 
 /* HTTP GET /accounts/:username?auth_token=auth_token
  * Param username: the username of the user.
@@ -33,10 +34,8 @@ router.get('/:username', function(req, res) {
   var db = req.db;
   var accountsFilter = (req.query.filter || '').split(',');
  
-  db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
-      if(docs.length == 1 && docs[0].username==req.params.username) {
+  accessControl.authorizeRead(req.params.username, req.query.auth_token, function() {
           try {
-            if(docs.length == 1 && docs[0].username==req.params.username) {
                 // Expenses transactions are booked as source,destination,amount. Each account balance is the
                 //  sum of the amounts where that account was the destination minus the sum of
                 //  the amounts where that account was the source. We make that calculation here using
@@ -72,16 +71,13 @@ router.get('/:username', function(req, res) {
                     }
                   }                                          
                 );
-            } else {
-                res.send(401);
-            }
          } catch (err) {
            res.send(401);
          }
-     } else {
+     },
+     function() {
         res.send(401);
-     }
-   });
+     });
 });
 
 module.exports = router;

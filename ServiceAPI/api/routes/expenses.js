@@ -21,9 +21,10 @@
 var express = require('express');
 var router = express.Router();
 var ObjectId = require('mongodb').ObjectID;
+var accessControl = require('../accessControl.js');
 
 /* HTTP GET /expenses/:username?auth_token=auth_token
- * Param username: the username of the user.
+ * Param username: the username of the owner of the expenses.
  * Query param auth_token: a valid authoerization tolken
  * Returns: all expenses for the specified user.
  * Error: 401 if the auth_token doesn't authorize the operation.
@@ -31,19 +32,21 @@ var ObjectId = require('mongodb').ObjectID;
 router.get('/:username', function(req, res) {
   
   var db = req.db;
-  db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+  var username = req.params.username;
+  var auth_token =  req.query.auth_token;
+  
+  accessControl.authorizeRead(username, auth_token, 
+      function onAllowed() {
+        db.collection('transactions').find({ username: req.params.username },{}, function(e,docs){
           try {
-            if(docs.length == 1 && docs[0].username==req.params.username) {
-                db.collection('transactions').find({ username: req.params.username },{}, function(e,docs){
-                    res.json( docs );
-                });
-            } else {
-                res.send(401);
-            }
-         } catch (Exception) {
-           res.send(401);
-         }
-        });
+            res.json( docs );
+          } catch (e) {
+            res.send(401);
+          }
+        })},
+      function onDenied() {
+        res.send(401);
+      });
 });
 
 /* HTTP GET /expenses/:username/:id?auth_token=auth_token
@@ -54,130 +57,127 @@ router.get('/:username', function(req, res) {
  * Error: 401 if the auth_token doesn't authorize the operation.
  */
 router.get('/:username/:id', function(req, res) {
-  
+
   var db = req.db;
-  db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
+  var username = req.params.username;
+  var auth_token =  req.query.auth_token;
+  
+  accessControl.authorizeRead(username, auth_token, 
+      function onAllowed() {
+        db.collection('transactions').find({ username: req.params.username , _id:new ObjectId(req.params.id) },{}, function(e,docs){
           try {
-            if(docs.length == 1 && docs[0].username==req.params.username) {
-                db.collection('transactions').find({ username:req.params.username, _id:new ObjectId(req.params.id) },{}, function(e,docs){
-                    res.json( docs );
-                });
-            } else {
-                res.send(401);
-            }
-          } catch (Exception) {
-               console.log(Exception);
-               res.send(401);
+            res.json( docs );
+          } catch (e) {
+            res.send(401);
           }
-        });
+        })},
+      function onDenied() {
+        res.send(401);
+      });
 });
 
 /* HTTP POST /expenses/:username?auth_token=auth_token
- * Param username: the username of the user.
+ * Param username: the username of the user owning the expense.
  * Query param auth_token: a valid authoerization tolken
- * POST data: a json describing the expense
- * Returns: all expenses for the specified user.
+ * POST data: a json document describing the expense
+ * Returns: 200 on success.
  * Error: 401 if the auth_token doesn't authorize the operation.
  */
 router.post('/:username', function(req, res) {
+
+  var db = req.db;
+  var username = req.params.username;
+  var auth_token =  req.query.auth_token;
     
-    var db = req.db;
-    console.log(req.body);
-    expense = req.body;
-    try {
-    db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
-          try {
-            if(docs.length == 1 && docs[0].username==req.params.username) {
-                expense.username = req.params.username;
-                expense.amount = parseFloat(expense.amount.replace('"',''));
-                db.collection('transactions').insert(expense,{}, function(e,docs){
-                    res.send(200);
-                });
-            } else {
-                res.send(401);
-            }
-          } catch (Exception) {
-               res.send(401);
-          }            
-        });
-    } catch (Exception) {
-      res.send(401);
-    }
+  accessControl.authorizeCreate(username, auth_token, 
+      function onAllowed() {
+        try {
+          expense = {};
+          expense.username = req.params.username;
+          expense.amount = parseFloat((req.body.amount || '0').replace('"',''));
+          expense.from = req.body.from || '';
+          expense.to = req.body.to || '';
+          expense.notes = req.body.notes || '';
+          expense.timestamp = req.body.timestamp;
+          
+          db.collection('transactions').insert(expense,{}, function(e,docs){
+            res.send(200);
+          });
+        } catch (Exception) {
+             res.send(401);
+        }            
+      },
+      function onDenied() {
+        res.send(401);
+      });
 });
 
 /* HTTP PUT /expenses/:username/:id?auth_token=auth_token
- * Param username: the username of the user.
- * Param id: the id of the expense.
+ * Param username: the username of the user owning the expense.
+ * Param id: the id of the expense to modify.
  * Query param auth_token: a valid authoerization tolken
- * POST data: a json describing the expense
- * Returns: all expenses for the specified user.
+ * POST data: a json describing the updated expense.
+ * Returns: 200 on success.
  * Error: 401 if the auth_token doesn't authorize the operation.
  */
 router.put('/:username/:id', function(req, res) {
     
-    var db = req.db;
-    expense = req.body;
-    try{
-      db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
-        if(docs.length == 1 && docs[0].username==req.params.username) {
-            try {
-            expense.username = req.params.username;
-            expense._id = new ObjectId(req.params.id);
-            db.collection('transactions').update({'_id':new ObjectId(req.params.id)}, expense, {safe:true}, function(err, result) {
-                if (err) {
-                  console.log('Error updating expense: ' + err);
-                  res.send(500);
-                } else {
-                  console.log('' + result + ' document(s) updated');
-                  res.send(expense);
-                }
-              });
-            } catch (Exception) {
-              res.send(401);
-            }
-          } else {
-              res.send(401);
-          }
-        });
-      } catch (Exception) {
-           res.send(401);
-      }
+  var db = req.db;
+  var username = req.params.username;
+  var auth_token =  req.query.auth_token;
+  var transactionId = req.params.id;
+  
+  accessControl.authorizeUpdate(username, auth_token, 
+      function onAllowed() {
+        //try {
+          expense = {};
+          expense.username = req.params.username;
+          expense.amount = req.body.amount;
+          expense.from = req.body.from || '';
+          expense.to = req.body.to || '';
+          expense.notes = req.body.notes || '';
+          expense.timestamp = req.body.timestamp;
+          
+          db.collection('transactions').update({'_id':new ObjectId(transactionId)}, expense, {safe:true}, function(err, result) {
+            res.send(200);
+          });
+        /*} catch (err) {
+             res.send(401);
+        }*/            
+      },
+      function onDenied() {
+        res.send(403);
+      });
 });
 
 /* HTTP DELETE /expenses/:username/:id?auth_token=auth_token
- * Param username: the username of the user.
- * Param id: the id of the expense.
+ * Param username: the username of the user owning the expense.
+ * Param id: the id of the expense to delete.
  * Query param auth_token: a valid authoerization tolken
- * POST data: a json describing the expense
- * Returns: all expenses for the specified user.
+ * Returns: 200 on success.
  * Error: 401 if the auth_token doesn't authorize the operation.
  */
 router.delete('/:username/:id', function(req, res) {
     
-    var db = req.db;
-    expense = req.body;
-    try {
-    db.collection('auth_tokens').find({auth_token:req.query.auth_token} , function(e, docs) {
-            if(docs.length == 1 && docs[0].username==req.params.username) {
-        expense.username = req.params.username;
-        
-        db.collection('transactions').remove({'_id':new ObjectId(req.params.id)}, {safe:true}, function(err, result) {
+  var db = req.db;
+  var username = req.params.username;
+  var auth_token =  req.query.auth_token;
+  var transactionId = req.params.id;
+  
+  accessControl.authorizeDelete(username, auth_token, 
+      function onAllowed() {
+        try {
+          db.collection('transactions').remove({'_id':new ObjectId(req.params.id)}, {safe:true}, function(err, result) {
             if (err) {
-              console.log('Error deleting expense: ' + err);
-              res.send(500);
+              res.send(401);
             } else {
-              console.log('' + result + ' document(s) deleted');
               res.send(200);
             }
           });
-            } else {
-                res.send(401);
-            }
-        });
-     } catch (Exception) {
-        res.send(401);
-     }
+        } catch (Exception) {
+          res.send(401);
+        }
+      });
 });
-
 
 module.exports = router;
