@@ -1,4 +1,4 @@
-ExpensesWebService
+Service API
 ==================
 
 Web service for the Expense Reporter application and for the WEB Client.
@@ -9,3 +9,6 @@ This is a ReSTful API to access expense data. The service is built in node.js us
 
 
 See the wiki for the API
+
+
+<https://github.com/nicolacimmino/ExpensesTracker/wiki/API>
