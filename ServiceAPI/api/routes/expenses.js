@@ -95,8 +95,8 @@ router.post('/:username', function(req, res) {
           expense = {};
           expense.username = req.params.username;
           expense.amount = parseFloat((req.body.amount || '0').replace('"',''));
-          expense.from = req.body.from || '';
-          expense.to = req.body.to || '';
+          expense.source = req.body.source || '';
+          expense.destination = req.body.destination || '';
           expense.notes = req.body.notes || '';
           expense.timestamp = req.body.timestamp;
           
@@ -133,8 +133,8 @@ router.put('/:username/:id', function(req, res) {
           expense = {};
           expense.username = req.params.username;
           expense.amount = req.body.amount;
-          expense.from = req.body.from || '';
-          expense.to = req.body.to || '';
+          expense.source = req.body.source || '';
+          expense.destination = req.body.destination || '';
           expense.notes = req.body.notes || '';
           expense.timestamp = req.body.timestamp;
           

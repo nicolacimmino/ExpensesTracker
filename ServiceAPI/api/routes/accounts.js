@@ -48,11 +48,11 @@ router.get('/:username', function(req, res) {
                 //     amounts saved.
                 db.collection('transactions').mapReduce(
                   function() {                                                                          // Mapping function
-                    if(accountsFilter.indexOf(this.from.toLowerCase()) > -1) { 
-                      emit(this.from, -this.amount) 
+                    if(accountsFilter.indexOf(this.source.toLowerCase()) > -1) { 
+                      emit(this.source, -this.amount) 
                     };
-                    if(accountsFilter.indexOf(this.to.toLowerCase()) > -1) { 
-                      emit(this.to, this.amount); 
+                    if(accountsFilter.indexOf(this.destination.toLowerCase()) > -1) { 
+                      emit(this.destination, this.amount); 
                     }      
                   },    
                   function(account, amounts) {                                                          // Reduction function
@@ -63,11 +63,11 @@ router.get('/:username', function(req, res) {
                     scope: { accountsFilter:accountsFilter}, 
                     query: { username:req.params.username} 
                   },        
-                  function(e,docs, stats){                                                              // Callback
+                  function(e,docs,stats){                                                               // Callback
                     try {
                       res.send( docs ); 
                     } catch (err) {
-                      res.send(501);
+                      res.send(401);
                     }
                   }                                          
                 );

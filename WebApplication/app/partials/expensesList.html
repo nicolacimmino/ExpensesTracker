@@ -14,8 +14,8 @@
   </tr>
   <tr ng-repeat="expense in expensesList | filter : searchFilter" ng-click="edit_expense(expense)">
     <td>{{expense.timestamp}}</td>
-    <td>{{expense.from}}</td>
-    <td>{{expense.to}}</td>
+    <td>{{expense.source}}</td>
+    <td>{{expense.destination}}</td>
     <td>{{expense.amount}}</td>
     <td>{{expense.notes}}</td>
   </tr>
