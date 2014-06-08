@@ -15,9 +15,23 @@ API
 
 Creates an autentication token that can be used to later access other parts of the API. 
 
-`curl -i -X POST 127.0.0.1:3000/users/guest/auth_token --data "{\"password\":\"guest\"}" -H "Content-Type: application/json"`
+`
+curl -i -X POST 127.0.0.1:3000/users/guest/auth_token --data "{\"password\":\"guest\"}" -H "Content-Type: application/json"
+`
 
+Response:
 
+`
+HTTP/1.1 200 OK
+Date: Sun, 08 Jun 2014 18:39:01 GMT
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Content-Type: application/json
+Content-Length: 113
+
+{"auth_token":"0d6f66b1f132271ddad0d71218eb365e679ee8afa6e781f8c7a89dc1607c4d0db
+021add5670b240aaa1c2eae9f22f18f"}
+`
 
 **HTTP GET /users/:username/auth_token**
 
