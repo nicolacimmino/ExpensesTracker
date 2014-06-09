@@ -8,8 +8,8 @@ The table below is a summary of the API resources and operations, for full docum
 |Resource|Method|Description|
 |--------|------|-----------|
 |users/:userid/auth_token| POST | Creates an authorization token for the supplied credentials.|
-|expenses/:userid/| GET | Gets all the expenses for the supplied user.|
-|expenses/:userid/| POST | Creates a new expense for the supplied user.|
+|expenses/:userid| GET | Gets all the expenses for the supplied user.|
+|expenses/:userid| POST | Creates a new expense for the supplied user.|
 |expenses/:userid/:expenseID| GET | Gets all the information for the supplied expense.|
 |expenses/:userid/:expenseID| PUT | Updates the information for the supplied expense.|
 |expenses/:userid/:expenseID| DELETE | Deletes the supplied expense.|
