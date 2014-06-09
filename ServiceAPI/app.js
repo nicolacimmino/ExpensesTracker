@@ -1,4 +1,4 @@
-/* app.js is part of Expenses API and bootstraps the application.
+/* app.js is part of Expenses Tracker API and bootstraps the application.
  *
  *   Copyright (C) 2014 Nicola Cimmino
  *
@@ -120,4 +120,3 @@ app.use(function(err, req, res, next) {
 app.set('port', 3000);
 var server = app.listen(app.get('port'));
 
-//module.exports = app;

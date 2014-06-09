@@ -1,4 +1,4 @@
-/* accessControl.js is part of ExpensesWebInterface and is responsible to
+/* accessControl.js is part of Expenses Tracker API and is responsible to
  ~      provide access control for API requests.
  *
  *   Copyright (C) 2014 Nicola Cimmino
@@ -20,14 +20,16 @@
 
 var bcrypt = require('bcrypt');
 var crypto = require('crypto');
-
-
 var db;
 
+// Allows to inject the database dependency.
 module.exports.use = function(database) {
   db=database;
 }
 
+// Generates an authentication token if the supplied credentials are valid.
+// The function takes two callbacks that are called in case of authentication
+// success and failure respectively.
 module.exports.getAuthToken  = function (username, password, onAllowed, onDenied) { 
 
   db.collection('users').find({ username:username },{}, 
@@ -59,8 +61,13 @@ module.exports.getAuthToken  = function (username, password, onAllowed, onDenied
       });
 };  
 
+// NOTE: The methods below allow to authorize each of the four CRUD operation separately. We don't
+//  have yet ACLs in place so they all have the same impemmentation at the moment. In other words
+//  a valid token allows all CRUD operations. Defining the functions now though allows to freeze
+//  the interface so we don't have to change the rest of the code when ACLs are in place.
 
-
+// Checks if the supplied token allows create operations on a resource owned by username.
+// Takes two callback function that are called in case of operation permitted or denied respectively.
 module.exports.authorizeCreate = function (username, auth_token, onAllowed, onDenied) {
     db.collection('auth_tokens').find({auth_token:auth_token, username:username} , function(e, docs) {
       if(docs.length === 1) {
@@ -71,6 +78,8 @@ module.exports.authorizeCreate = function (username, auth_token, onAllowed, onDe
     }); 
 };
 
+// Checks if the supplied token allows read operations on a resource owned by username.
+// Takes two callback function that are called in case of operation permitted or denied respectively.
 module.exports.authorizeRead = function (username, auth_token, onAllowed, onDenied) {
     db.collection('auth_tokens').find({auth_token:auth_token, username:username} , function(e, docs) {
       if(docs.length === 1) {
@@ -81,7 +90,8 @@ module.exports.authorizeRead = function (username, auth_token, onAllowed, onDeni
     }); 
 };
 
-
+// Checks if the supplied token allows update operations on a resource owned by username.
+// Takes two callback function that are called in case of operation permitted or denied respectively.
 module.exports.authorizeUpdate = function (username, auth_token, onAllowed, onDenied) {
     db.collection('auth_tokens').find({auth_token:auth_token, username:username} , function(e, docs) {
       if(docs.length === 1) {
@@ -92,6 +102,8 @@ module.exports.authorizeUpdate = function (username, auth_token, onAllowed, onDe
     }); 
 };
 
+// Checks if the supplied token allows delete operations on a resource owned by username.
+// Takes two callback function that are called in case of operation permitted or denied respectively.
 module.exports.authorizeDelete = function (username, auth_token, onAllowed, onDenied) {
     db.collection('auth_tokens').find({auth_token:auth_token, username:username} , function(e, docs) {
       if(docs.length === 1) {
