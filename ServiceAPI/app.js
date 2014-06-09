@@ -117,5 +117,7 @@ app.use(function(err, req, res, next) {
     });
 });
 
+app.set('port', 3000);
+var server = app.listen(app.get('port'));
 
-module.exports = app;
+//module.exports = app;
