@@ -1,53 +1,50 @@
-	<div class="jumbotron hidden-xs">
-		<div class="container">
-			<div class="col-sm-8 container">
-				<h1>Track your expenses</h1>
-				<blockquote>
-          <p>Wiser is he who tracks cause he will spend less.</p>
-          <footer>Anonymous</footer>
-        </blockquote>	
-			</div>	
-			<div class="col-sm-4">
-				<img class="img-responsive" src="img/coins.png"></img>
-			</div>
-		</div>
-	</div>
-	<div class="jumbotron visible-xs">
-		<div class="container">			
-			<h1>Track your expenses</h1>
+<div class="jumbotron hidden-xs">
+  <div class="container">
+    <div class="col-sm-8 container">
+      <h1>Track your expenses</h1>
       <blockquote>
-          <p>Wiser is he who tracks cause he will spend less.</p>
-          <footer>Anonymous</footer>
-      </blockquote>			
-		</div>
-	</div>
-  
-    <div ng-class="loginFormVisibility()">
-    <div class="jumbotron">
-        <div class="container">
-        <div class="col-md-6 container">
-        <div class="lead text-justify">To get started please log in.</div>
-        <div class="text-justify">
-        If you don't have an account you can try the service using <strong>guest/guest</strong> as login/password.
-        </div>
-        </div>
-        <div class="col-md-6">
-        <form class="form-signin" id="login_form">
-        <div class="form-group">
-          <label for="login_usernname" id="login_username_label">Username</label>
-          <input type="text" ng-model="username" placeholder="Username" class="form-control" id="login_usernname" required autofocus>
-        </div>
-        <div class="form-group">
-          <label for="login_password" id="login_password_label">Password</label>
-          <input type="password" ng-model="password" placeholder="Password" class="form-control" id="login_password" required>
-        </div>
-        <br>
-        <input type="submit" ng-click="login(username,password)" class="btn btn-lg btn-success btn-block" value="Log in">
-        </form>
-        </div>
-        </div>
-    </div> 
-  
+        <p>Wiser is he who tracks cause he will spend less.</p>
+        <footer>Anonymous</footer>
+      </blockquote>	
+    </div>	
+    <div class="col-sm-4">
+      <img class="img-responsive" src="img/coins.png"></img>
     </div>
-  
-  
+  </div>
+</div>
+<div class="jumbotron visible-xs">
+  <div class="container">			
+    <h1>Track your expenses</h1>
+    <blockquote>
+        <p>Wiser is he who tracks cause he will spend less.</p>
+        <footer>Anonymous</footer>
+    </blockquote>			
+  </div>
+</div>
+
+<div ng-class="loginFormVisibility()">
+  <div class="jumbotron">
+      <div class="container">
+      <div class="col-md-6 container">
+      <div class="lead text-justify">To get started please log in.</div>
+      <div class="text-justify">
+      If you don't have an account you can try the service using <strong>guest/guest</strong> as login/password.
+      </div>
+      </div>
+      <div class="col-md-6">
+      <form class="form-signin" id="login_form">
+      <div class="form-group">
+        <label for="login_usernname" id="login_username_label">Username</label>
+        <input type="text" ng-model="username" placeholder="Username" class="form-control" id="login_usernname" required autofocus>
+      </div>
+      <div class="form-group">
+        <label for="login_password" id="login_password_label">Password</label>
+        <input type="password" ng-model="password" placeholder="Password" class="form-control" id="login_password" required>
+      </div>
+      <br>
+      <input type="submit" ng-click="login(username,password)" class="btn btn-lg btn-success btn-block" value="Log in">
+      </form>
+      </div>
+      </div>
+  </div> 
+</div>

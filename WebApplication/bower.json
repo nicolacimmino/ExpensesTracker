@@ -1,9 +1,8 @@
 {
-  "name": "angular-seed",
-  "description": "A starter project for AngularJS",
-  "version": "0.0.0",
-  "homepage": "https://github.com/angular/angular-seed",
-  "license": "MIT",
+  "name": "ExpensesTrackerWebApplication",
+  "description": "Web App for Expenses tracker, seeded with Angular Seed.",
+  "version": "0.0.1",
+  "license": "GPL3",
   "private": true,
   "dependencies": {
     "angular": "1.2.x",

@@ -12,7 +12,7 @@
     <!-- Bootstrap core CSS -->
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Out customization of bootstrap styles -->
+    <!-- Our customization of bootstrap styles -->
     <link href="css/style.css" rel="stylesheet">
 
   </head>
@@ -38,7 +38,7 @@
               this di is the one that is supplied as data-target in the toggle button -->
           <div class="collapse navbar-collapse" id="nav-bar-collapse">
             <ul class="nav navbar-nav navbar-right">
-            <li ng-class="menuClass('home')"><a href="#/home">Home</a></li>			
+            <li ng-class="menuClass('home')"><a href="#/home">Home</a></li>      
             <li class="dropdown" ng-class="menuClass('expenses')">
               <a class="dropdown-toggle" data-toggle="dropdown">My Expenses <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -53,7 +53,7 @@
             </li>
             <li ng-class="menuClass('about')"><a href="#/about">About</a></li>
             <li ng-class="menuClass('contact')"><a href="#/contact">Contact</a></li>
-            </ul>		  
+            </ul>      
           </div><!-- /.navbar-collapse -->
           </div><!-- /.container-fluid -->
         </nav>
@@ -81,9 +81,7 @@
     
     </div> <!--container-->
 
-    
-    
-    
+    <!-- We load scripts last so that the page appears more promptly -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
     <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="bower_components/angular/angular.js"></script>
