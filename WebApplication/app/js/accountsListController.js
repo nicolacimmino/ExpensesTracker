@@ -1,5 +1,4 @@
-/* utils.js is part of ExpensesTrackerWebApplication SPA and provides general utility
- ~    global functions.
+/* accountsListController.js is part of ExpensesTrackerWebApplication SPA.
  *
  *   Copyright (C) 2014 Nicola Cimmino
  *
@@ -17,15 +16,21 @@
  *    along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
- 
- // Give visual feedback to the use that page is busy.
-function pageBusy() {
-  $('body').css('cursor','wait');
-  $('#pleaseWaitDialog').show();
-}
+'use strict';
 
-// Remove visual feedback of page is busy.
-function pageFree() {
-  $('body').css('cursor','default');
-  $('#pleaseWaitDialog').hide();
-}
+angular.module('ExpensesWebClient.controllers').
+  controller('accountsListController', function($scope, $location, expensesAPIservice, localStorageService) {
+       
+    // Asyncronously fetch accounts from the API and report them to the scope.
+    if(localStorageService.get('auth_token')) {
+      pageBusy();
+      expensesAPIservice.getAccounts(localStorageService.get('auth_token')).success(function (response,status, headers, config) {
+        $scope.accountsList = response;
+        pageFree();
+      });  
+    } else {
+      $location.path('/');
+    }
+    
+  });
+  

@@ -18,11 +18,15 @@
  */
 'use strict';
 
+// Create modules and inject needed dependencies.
+angular.module('ExpensesWebClient.expensesAPIservice', ['LocalStorageModule']);
+angular.module('ExpensesWebClient.controllers', []);
+
 // Inject dependencies to controllers and services
 //  into the ExpensesWebClient module.
 angular.module('ExpensesWebClient', [
   'ExpensesWebClient.controllers',
-  'ExpensesWebClient.services',
+  'ExpensesWebClient.expensesAPIservice',
   'ngRoute',
   'LocalStorageModule'
   ]).

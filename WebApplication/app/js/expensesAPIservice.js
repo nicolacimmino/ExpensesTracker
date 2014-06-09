@@ -1,4 +1,4 @@
-/* controllers.js is part of ExpensesWebClient SPA contains the controllers.
+/* expensesAPIservice.js is part of ExpensesTrackerWebApplication SPA contains the expensesAPIservice.
  *
  *   Copyright (C) 2014 Nicola Cimmino
  *
@@ -21,8 +21,7 @@
 // Add a factory to encapsulate the Expenses API.
 // Note that the API has CORS enabled so we don't need to use
 //  JSOND on the client side to circumvent the same origin policy. 
-//
-angular.module('ExpensesWebClient.services', ['LocalStorageModule']).
+angular.module('ExpensesWebClient.expensesAPIservice').
   factory('expensesAPIservice', function($http, localStorageService) {
 
     var expensesAPIservice = {};
