@@ -36,6 +36,9 @@ module.exports.getAuthToken  = function (username, password, onAllowed, onDenied
       function(e,docs){
         try {
           if(docs.length == 1) {
+            // compareSync compare a password with an hashed and salted password.
+            // We do not store passwords in clear in db, compareSync is taking care
+            //  of hasing and salting.
             if(bcrypt.compareSync(password, docs[0].password)) {
               crypto.randomBytes(48, function(ex, buf) {
                 db.collection('auth_tokens').insert(
@@ -54,6 +57,8 @@ module.exports.getAuthToken  = function (username, password, onAllowed, onDenied
             } else {
               onDenied();
             }
+          } else {
+            onDenied();
           }
         } catch (Exception) {
               onDenied();
