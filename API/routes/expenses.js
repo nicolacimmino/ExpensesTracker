@@ -129,7 +129,7 @@ router.put('/:username/:id', function(req, res) {
   
   accessControl.authorizeUpdate(username, auth_token, 
       function onAllowed() {
-        //try {
+        try {
           expense = {};
           expense.username = req.params.username;
           expense.amount = req.body.amount;
@@ -141,9 +141,9 @@ router.put('/:username/:id', function(req, res) {
           db.collection('transactions').update({'_id':new ObjectId(transactionId)}, expense, {safe:true}, function(err, result) {
             res.send(200);
           });
-        /*} catch (err) {
+        } catch (err) {
              res.send(401);
-        }*/            
+        }            
       },
       function onDenied() {
         res.send(403);
