@@ -93,8 +93,8 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
                 authenticationData.put("notes", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION)));
                 authenticationData.put("currency", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY)));
                 authenticationData.put("amount", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT)));
-                authenticationData.put("to", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION)));
-                authenticationData.put("from", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE)));
+                authenticationData.put("destination", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION)));
+                authenticationData.put("source", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE)));
                 authenticationData.put("timestamp", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP)));
 
                 byte[] postDataBytes = authenticationData.toString(0).getBytes("UTF-8");
