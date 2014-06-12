@@ -1,9 +1,12 @@
 package com.nicolacimmino.expensestracker.tracker.gcm;
 
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.Ringtone;
@@ -13,9 +16,12 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nicolacimmino.expensestracker.tracker.R;
+import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
+import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticatorContract;
 import com.nicolacimmino.expensestracker.tracker.ui.MainActivity;
 
 public class GcmIntentService extends IntentService {
@@ -54,21 +60,28 @@ public class GcmIntentService extends IntentService {
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
 
-                Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
+                //getApplicationContext().getContentResolver().notifyChange(ExpenseDataContract.Expense.CONTENT_URI, null, true);
+                getContentResolver().requestSync(getmAccount(), ExpenseDataContract.CONTENT_AUTHORITY, extras);
+
                 // Post notification of received message.
-                sendNotification("Received: " + extras.toString());
-                try {
-                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-                    Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-                    r.play();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                sendNotification("Expenses updated!");
+
                 Log.i(TAG, "Received: " + extras.toString());
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         GcmBroadcastReceiver.completeWakefulIntent(intent);
+    }
+
+    // TODO cleanup, rather get the account injected from caller or do something else.
+    // THis depends also on how we will decide to handle multiple acconts if supported at all.
+    private Account getmAccount()
+    {
+        Account theAccount;
+        AccountManager accountManager = AccountManager.get(this);
+        Account[] accounts =  accountManager.getAccountsByType(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
+        theAccount = accounts[0];
+        return theAccount;
     }
 
     // Put the message into a notification and post it.
@@ -91,5 +104,13 @@ public class GcmIntentService extends IntentService {
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

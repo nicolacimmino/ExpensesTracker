@@ -32,8 +32,11 @@ import org.json.*;
 
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -149,8 +152,74 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
         }
-
         expenses.close();
+
+        fetchExpensesFromServer(authToken);
+
         Log.i(TAG, "Sync done");
+    }
+
+    public void fetchExpensesFromServer(String authToken)
+    {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL("http://expensesapi.nicolacimmino.com/expenses/nicola?auth_token=" + authToken);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(false);
+            connection.setDoInput(true);
+            connection.setInstanceFollowRedirects(true);
+            connection.setRequestMethod("GET");
+            connection.setUseCaches(false);
+
+            BufferedReader is = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String inputLine ="";
+            String response = "";
+            while((inputLine = is.readLine()) != null) {
+                response += inputLine;
+            }
+            is.close();
+
+            getContext().getContentResolver().delete(ExpenseDataContract.Expense.CONTENT_URI,
+                    ExpenseDataContract.Expense.COLUMN_NAME_SYNC + "=1", null);
+
+            JSONArray jsonObject = new JSONArray(response);
+            for(int ix=0; ix<jsonObject.length(); ix++) {
+                Log.i(TAG, "Expense: " + jsonObject.getJSONObject(ix).get("amount"));
+
+                ContentValues values = new ContentValues();
+                values.put(ExpenseDataContract.Expense.COLUMN_NAME_SYNC, "1");
+                values.put(ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY, "eur");
+                values.put(ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT, jsonObject.getJSONObject(ix).getString("amount"));
+                values.put(ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION, jsonObject.getJSONObject(ix).getString("notes"));
+                values.put(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE, jsonObject.getJSONObject(ix).getString("source"));
+                values.put(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION, jsonObject.getJSONObject(ix).getString("destination"));
+                if(jsonObject.getJSONObject(ix).has("timestamp")) {
+                    values.put(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP, jsonObject.getJSONObject(ix).getString("timestamp"));
+                } else {
+                    values.put(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP, "19750620 16:00:00");
+                }
+
+                getContext().getContentResolver().insert(ExpenseDataContract.Expense.CONTENT_URI,
+                        values);
+            }
+
+            Log.i(TAG, String.valueOf(response));
+            Log.i(TAG, "Server expenses:" + response);
+            connection.disconnect();
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "URL is malformed", e);
+            return;
+        } catch (IOException e) {
+            Log.e(TAG, "Error reading from network: " + e.toString());
+            return;
+        } catch (JSONException e) {
+            Log.e(TAG, "Invalid JSON: " + e.toString());
+            return;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+
     }
 }
