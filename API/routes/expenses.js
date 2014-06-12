@@ -22,6 +22,7 @@ var express = require('express');
 var router = express.Router();
 var ObjectId = require('mongodb').ObjectID;
 var accessControl = require('../accessControl.js');
+var gcmService = require('../gcmService.js');
 
 /* HTTP GET /expenses/:username?auth_token=auth_token
  * Param username: the username of the owner of the expenses.
@@ -101,6 +102,7 @@ router.post('/:username', function(req, res) {
           expense.timestamp = req.body.timestamp;
           
           db.collection('transactions').insert(expense,{}, function(e,docs){
+            gcmService.notifyUserMobiles(db,username);
             res.send(200);
           });
         } catch (Exception) {
@@ -139,6 +141,7 @@ router.put('/:username/:id', function(req, res) {
           expense.timestamp = req.body.timestamp;
           
           db.collection('transactions').update({'_id':new ObjectId(transactionId)}, expense, {safe:true}, function(err, result) {
+            gcmService.notifyUserMobiles(db,username);
             res.send(200);
           });
         } catch (err) {
@@ -171,6 +174,7 @@ router.delete('/:username/:id', function(req, res) {
             if (err) {
               res.send(401);
             } else {
+              gcmService.notifyUserMobiles(db,username);
               res.send(200);
             }
           });

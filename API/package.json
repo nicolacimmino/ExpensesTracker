@@ -15,6 +15,7 @@
     "mongodb": "*",
     "mongojs": "~0.13.0",
     "bcrypt": "*",
-    "cors": "*"
+    "cors": "*",
+    "gcm": "*"
   }
 }

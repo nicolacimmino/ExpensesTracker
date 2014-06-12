@@ -87,10 +87,12 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var expenses = require('./routes/expenses');
 var accounts = require('./routes/accounts');
+var mobiles = require('./routes/mobiles');
 app.use('/', routes);
 app.use('/users', users);
 app.use('/expenses', expenses);
 app.use('/accounts', accounts);
+app.use('/mobiles', mobiles);
 
 // As mentioned above the middleware injected  is executed in the order in which it's injected
 // so this goes at the end of the chain and will  set the response code to 404 (not found) as none

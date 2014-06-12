@@ -61,7 +61,7 @@ module.exports.getAuthToken  = function (username, password, onAllowed, onDenied
             onDenied();
           }
         } catch (Exception) {
-              onDenied();
+          onDenied();
         }
       });
 };  
