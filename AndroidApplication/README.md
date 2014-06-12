@@ -20,6 +20,8 @@ Additionally at the first start the application asks the user to authenticate wi
 Software Architecture
 ===========
 
-Below is an oversimplified view of the architecture of the application. Data is stored locally on the phone in a SQLite database. This allows to use the application even when there is no internet connection. The Sync Service allows to leverage Android highly optimized Sync framework that allows to keep sync operations at a minimum and to have them scheduled oppurtunistically in order to reduce power consuption. On the server side is a ReSTful HTTP service that accepts the new data. There is no provision for sync of data from the server to the mobile since the main purpose of the application is to allow user to enter expenses in the system. Should the application be expanded to sync also in this direction GCM (Google Cloud Messaging) service would be a better choice from a power consumption standpoint, at least to notify the presence of new data.
+Below is an oversimplified view of the architecture of the application. Data is stored locally on the phone in a SQLite database. This allows to use the application even when there is no internet connection. The Sync Service allows to leverage Android highly optimized Sync framework that allows to keep sync operations at a minimum and to have them scheduled oppurtunistically in order to reduce power consuption. On the server side is a ReSTful HTTP service that accepts the new data.
+
+Should the data on the server change, for instance if a user modifiyes an expense trough the Web Application, the server will send a notification to the Android terminal through Google Cloud Messaging so the application knows it has to trigger a sync in order to keep the locally cached data up to date.
 
 ![Screenshot](https://raw.github.com/nicolacimmino/ExpensesTracker/master/AndroidApplication/documentation/structure.png)
