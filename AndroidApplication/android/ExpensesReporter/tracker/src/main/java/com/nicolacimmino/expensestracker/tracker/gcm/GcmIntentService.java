@@ -4,11 +4,13 @@ package com.nicolacimmino.expensestracker.tracker.gcm;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -22,6 +24,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nicolacimmino.expensestracker.tracker.R;
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticatorContract;
+import com.nicolacimmino.expensestracker.tracker.ui.ExpensesListActivity;
 import com.nicolacimmino.expensestracker.tracker.ui.MainActivity;
 
 public class GcmIntentService extends IntentService {
@@ -92,25 +95,20 @@ public class GcmIntentService extends IntentService {
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, MainActivity.class), 0);
+                new Intent(this, ExpensesListActivity.class), 0);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("GCM Notification")
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(msg))
-                        .setContentText(msg);
+                        .setContentTitle("Expenses Tracker")
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
+                        .setContentText(msg)
+                        .setAutoCancel(true)
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                        .setLights(Color.rgb(219,70,0), 700, 1000)
+                        .setOnlyAlertOnce(true);
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-
-        try {
-            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
-            r.play();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
