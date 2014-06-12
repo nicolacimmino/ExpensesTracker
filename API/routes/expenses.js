@@ -38,7 +38,7 @@ router.get('/:username', function(req, res) {
   
   accessControl.authorizeRead(username, auth_token, 
       function onAllowed() {
-        db.collection('transactions').find({ username: req.params.username },{}, function(e,docs){
+        db.collection('transactions').find({ username: req.params.username },{}).sort({ timestamp:-1}, function(e,docs){
           try {
             res.json( docs );
           } catch (e) {
