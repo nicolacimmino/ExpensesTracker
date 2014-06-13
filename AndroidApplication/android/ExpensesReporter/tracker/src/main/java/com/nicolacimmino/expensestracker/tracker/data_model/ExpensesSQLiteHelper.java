@@ -26,37 +26,37 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
 
-    public static final String DATABASE_NAME = "Expenses";
-    public static final int DATABASE_VERSION = 7;
+  public static final String DATABASE_NAME = "Expenses";
+  public static final int DATABASE_VERSION = 7;
 
-    // Statement to create the database.
-    private static final String DATABASE_CREATE = "create table "
-            + ExpenseDataContract.Expense.TABLE_NAME + "("
-            + ExpenseDataContract.Expense.COLUMN_NAME_ID + " integer primary key autoincrement, "
-            + ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP + " timestamp default current_timestamp,"
-            + ExpenseDataContract.Expense.COLUMN_NAME_SYNC + " text not null default '0',"
-            + ExpenseDataContract.Expense.COLUMN_NAME_SOURCE + " text not null,"
-            + ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION + " text not null,"
-            + ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION + " text not null,"
-            + ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY + " text not null,"
-            + ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT + " text not null);";
+  // Statement to create the database.
+  private static final String DATABASE_CREATE = "create table "
+      + ExpenseDataContract.Expense.TABLE_NAME + "("
+      + ExpenseDataContract.Expense.COLUMN_NAME_ID + " integer primary key autoincrement, "
+      + ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP + " timestamp default current_timestamp,"
+      + ExpenseDataContract.Expense.COLUMN_NAME_SYNC + " text not null default '0',"
+      + ExpenseDataContract.Expense.COLUMN_NAME_SOURCE + " text not null,"
+      + ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION + " text not null,"
+      + ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION + " text not null,"
+      + ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY + " text not null,"
+      + ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT + " text not null);";
 
-    public ExpensesSQLiteHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
+  public ExpensesSQLiteHelper(Context context) {
+    super(context, DATABASE_NAME, null, DATABASE_VERSION);
+  }
 
-    @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        // Create the database.
-        sqLiteDatabase.execSQL(DATABASE_CREATE);
-    }
+  @Override
+  public void onCreate(SQLiteDatabase sqLiteDatabase) {
+    // Create the database.
+    sqLiteDatabase.execSQL(DATABASE_CREATE);
+  }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
-        // In this case we have a very simple policy to drop the database
-        //  and recreate it if the version is changed. This means user data is
-        //  lost. This is fine as the data is backed by the server.
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ExpenseDataContract.Expense.TABLE_NAME);
-        onCreate(sqLiteDatabase);
-    }
+  @Override
+  public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
+    // In this case we have a very simple policy to drop the database
+    //  and recreate it if the version is changed. This means user data is
+    //  lost. This is fine as the data is backed by the server.
+    sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ExpenseDataContract.Expense.TABLE_NAME);
+    onCreate(sqLiteDatabase);
+  }
 }

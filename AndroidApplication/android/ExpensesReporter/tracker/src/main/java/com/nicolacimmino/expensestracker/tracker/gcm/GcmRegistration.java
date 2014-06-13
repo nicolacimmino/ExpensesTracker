@@ -29,200 +29,200 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class GcmRegistration {
 
-    public static final String EXTRA_MESSAGE = "message";
-    public static final String PROPERTY_REG_ID = "registration_id";
-    private static final String PROPERTY_APP_VERSION = "appVersion";
-    String SENDER_ID = "958439099682";
+  public static final String EXTRA_MESSAGE = "message";
+  public static final String PROPERTY_REG_ID = "registration_id";
+  private static final String PROPERTY_APP_VERSION = "appVersion";
+  String SENDER_ID = "958439099682";
 
-    GoogleCloudMessaging gcm;
-    AtomicInteger msgId = new AtomicInteger();
-    Context mContext;
-    String registrationId;
-    SharedPreferences mSharedPreferences;
+  GoogleCloudMessaging gcm;
+  AtomicInteger msgId = new AtomicInteger();
+  Context mContext;
+  String registrationId;
+  SharedPreferences mSharedPreferences;
 
-    private static final String TAG = "GcmRegistration";
+  private static final String TAG = "GcmRegistration";
 
-    public GcmRegistration(Context context, SharedPreferences sharedPreferences) {
-        mContext = context;
-        mSharedPreferences = sharedPreferences;
+  public GcmRegistration(Context context, SharedPreferences sharedPreferences) {
+    mContext = context;
+    mSharedPreferences = sharedPreferences;
+  }
+
+  public void Register() {
+    gcm = GoogleCloudMessaging.getInstance(mContext);
+    registrationId = getRegistrationId();
+
+    if (registrationId.isEmpty()) {
+      registerInBackground();
     }
+  }
 
-    public void Register() {
-        gcm = GoogleCloudMessaging.getInstance(mContext);
-        registrationId = getRegistrationId();
-
-        if (registrationId.isEmpty()) {
-            registerInBackground();
-        }
+  /**
+   * Gets the current registration ID for application on GCM service.
+   * If result is empty, the app needs to register.
+   */
+  private String getRegistrationId() {
+    String registrationId = mSharedPreferences.getString(PROPERTY_REG_ID, "");
+    if (registrationId.isEmpty()) {
+      Log.i(TAG, "Registration not found.");
+      return "";
     }
-
-    /**
-     * Gets the current registration ID for application on GCM service.
-     * If result is empty, the app needs to register.
-     */
-    private String getRegistrationId() {
-        String registrationId = mSharedPreferences.getString(PROPERTY_REG_ID, "");
-        if (registrationId.isEmpty()) {
-            Log.i(TAG, "Registration not found.");
-            return "";
-        }
-        // Check if app was updated; if so, it must clear the registration ID
-        // since the existing regID is not guaranteed to work with the new
-        // app version.
-        int registeredVersion = mSharedPreferences.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-        int currentVersion = getAppVersion(mContext);
-        if (registeredVersion != currentVersion) {
-            Log.i(TAG, "App version changed.");
-            return "";
-        }
-        return registrationId;
+    // Check if app was updated; if so, it must clear the registration ID
+    // since the existing regID is not guaranteed to work with the new
+    // app version.
+    int registeredVersion = mSharedPreferences.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
+    int currentVersion = getAppVersion(mContext);
+    if (registeredVersion != currentVersion) {
+      Log.i(TAG, "App version changed.");
+      return "";
     }
+    return registrationId;
+  }
 
-    private void storeRegistrationId(String regId) {
-        int appVersion = getAppVersion(mContext);
-        Log.i(TAG, "Saving regId on app version " + appVersion);
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(PROPERTY_REG_ID, regId);
-        editor.putInt(PROPERTY_APP_VERSION, appVersion);
-        editor.commit();
+  private void storeRegistrationId(String regId) {
+    int appVersion = getAppVersion(mContext);
+    Log.i(TAG, "Saving regId on app version " + appVersion);
+    SharedPreferences.Editor editor = mSharedPreferences.edit();
+    editor.putString(PROPERTY_REG_ID, regId);
+    editor.putInt(PROPERTY_APP_VERSION, appVersion);
+    editor.commit();
+  }
+
+  private static int getAppVersion(Context context) {
+    try {
+      PackageInfo packageInfo = context.getPackageManager()
+          .getPackageInfo(context.getPackageName(), 0);
+      return packageInfo.versionCode;
+    } catch (PackageManager.NameNotFoundException e) {
+      // should never happen
+      throw new RuntimeException("Could not get package name: " + e);
     }
+  }
 
-    private static int getAppVersion(Context context) {
+
+  private void registerInBackground() {
+    new AsyncTask() {
+
+      @Override
+      protected Object doInBackground(Object[] objects) {
+        String msg = "";
         try {
-            PackageInfo packageInfo = context.getPackageManager()
-                    .getPackageInfo(context.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never happen
-            throw new RuntimeException("Could not get package name: " + e);
+          if (gcm == null) {
+            gcm = GoogleCloudMessaging.getInstance(mContext);
+          }
+          registrationId = gcm.register(SENDER_ID);
+          msg = "Device registered, registration ID=" + registrationId;
+          // Persist the regID - no need to register again.
+          storeRegistrationId(registrationId);
+        } catch (IOException ex) {
+          msg = "Error :" + ex.getMessage();
+          // If there is an error, don't just keep trying to register.
+          // Require the user to click a button again, or perform
+          // exponential back-off.
         }
-    }
+        return msg;
+      }
 
+      @Override
+      protected void onPostExecute(Object o) {
+        super.onPostExecute(o);
+        Log.i(TAG, "onPostExecute:" + o.toString());
+      }
+    }.execute(null, null, null);
 
-    private void registerInBackground() {
-        new AsyncTask() {
+  }
 
-            @Override
-            protected Object doInBackground(Object[] objects) {
-                String msg = "";
-                try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(mContext);
-                    }
-                    registrationId = gcm.register(SENDER_ID);
-                    msg = "Device registered, registration ID=" + registrationId;
-                    // Persist the regID - no need to register again.
-                    storeRegistrationId(registrationId);
-                } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
-                    // If there is an error, don't just keep trying to register.
-                    // Require the user to click a button again, or perform
-                    // exponential back-off.
-                }
-                return msg;
-            }
+  public void SendRegistrationIdToBackend(Account account) {
 
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-                Log.i(TAG, "onPostExecute:" + o.toString());
-            }
-        }.execute(null, null, null);
+    new AsyncTask() {
 
-    }
+      @Override
+      protected Object doInBackground(Object[] objects) {
 
-    public void SendRegistrationIdToBackend(Account account) {
+        Account account = (Account) objects[0];
 
-        new AsyncTask() {
+        // We need to be registered with the expenses API before we can report the registration key.
+        String authToken = "";
+        try
 
-            @Override
-            protected Object doInBackground(Object[] objects) {
+        {
+          authToken = AccountManager.get(mContext).blockingGetAuthToken(account, ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
+        } catch (
+            Exception e
+            )
 
-                Account account = (Account)objects[0];
+        {
+          Log.i(TAG, "Exception on get auth token");
+          return null;
+        }
 
-                // We need to be registered with the expenses API before we can report the registration key.
-                String authToken = "";
-                try
+        HttpURLConnection connection = null;
+        try
 
-                {
-                    authToken = AccountManager.get(mContext).blockingGetAuthToken(account, ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
-                } catch (
-                        Exception e
-                        )
+        {
+          Log.i(TAG, "Sendig gcm registration id to the expenses API");
 
-                {
-                    Log.i(TAG, "Exception on get auth token");
-                    return null;
-                }
+          JSONObject reportData = new JSONObject();
+          reportData.put("gcmRegistrationId", registrationId);
 
-                HttpURLConnection connection = null;
-                try
+          byte[] postDataBytes = reportData.toString(0).getBytes("UTF-8");
 
-                {
-                    Log.i(TAG, "Sendig gcm registration id to the expenses API");
+          URL url = new URL("http://expensesapi.nicolacimmino.com/mobiles/" + account.name + "?auth_token=" + authToken);
+          connection = (HttpURLConnection) url.openConnection();
+          connection.setDoOutput(true);
+          connection.setDoInput(true);
+          connection.setInstanceFollowRedirects(false);
+          connection.setRequestMethod("POST");
+          connection.setRequestProperty("Content-Type", "application/json");
+          connection.setRequestProperty("charset", "utf-8");
+          connection.setRequestProperty("Content-Length", "" + Integer.toString(postDataBytes.length));
+          connection.setUseCaches(false);
 
-                    JSONObject reportData = new JSONObject();
-                    reportData.put("gcmRegistrationId", registrationId);
+          DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+          wr.write(postDataBytes);
+          wr.flush();
+          wr.close();
 
-                    byte[] postDataBytes = reportData.toString(0).getBytes("UTF-8");
+          int response = connection.getResponseCode();
+          Log.i(TAG, String.valueOf(response));
+          connection.disconnect();
 
-                    URL url = new URL("http://expensesapi.nicolacimmino.com/mobiles/" + account.name + "?auth_token=" + authToken);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoOutput(true);
-                    connection.setDoInput(true);
-                    connection.setInstanceFollowRedirects(false);
-                    connection.setRequestMethod("POST");
-                    connection.setRequestProperty("Content-Type", "application/json");
-                    connection.setRequestProperty("charset", "utf-8");
-                    connection.setRequestProperty("Content-Length", "" + Integer.toString(postDataBytes.length));
-                    connection.setUseCaches(false);
+          if (response == 200) {
+            Log.i(TAG, "Registration Id registered with Expenses API");
+          } else {
+            Log.i(TAG, "Registration Id failed to register with Expenses API");
+          }
+        } catch (
+            MalformedURLException e
+            )
 
-                    DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-                    wr.write(postDataBytes);
-                    wr.flush();
-                    wr.close();
+        {
+          Log.e(TAG, "URL is malformed", e);
+          return null;
+        } catch (
+            IOException e
+            )
 
-                    int response = connection.getResponseCode();
-                    Log.i(TAG, String.valueOf(response));
-                    connection.disconnect();
+        {
+          Log.e(TAG, "Error reading from network: " + e.toString());
+          return null;
+        } catch (
+            JSONException e
+            )
 
-                    if (response == 200) {
-                        Log.i(TAG, "Registration Id registered with Expenses API");
-                    } else {
-                        Log.i(TAG, "Registration Id failed to register with Expenses API");
-                    }
-                } catch (
-                        MalformedURLException e
-                        )
+        {
+          Log.e(TAG, "Error building json doc: " + e.toString());
+          return null;
+        } finally
 
-                {
-                    Log.e(TAG, "URL is malformed", e);
-                    return null;
-                } catch (
-                        IOException e
-                        )
+        {
+          if (connection != null) {
+            connection.disconnect();
+          }
+        }
 
-                {
-                    Log.e(TAG, "Error reading from network: " + e.toString());
-                    return null;
-                } catch (
-                        JSONException e
-                        )
-
-                {
-                    Log.e(TAG, "Error building json doc: " + e.toString());
-                    return null;
-                } finally
-
-                {
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
-                }
-
-                return null;
-            }
-        }.execute(account);
-    }
+        return null;
+      }
+    }.execute(account);
+  }
 
 }

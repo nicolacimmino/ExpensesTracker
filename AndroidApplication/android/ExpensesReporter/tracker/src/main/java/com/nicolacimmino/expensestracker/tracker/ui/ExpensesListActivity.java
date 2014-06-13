@@ -27,23 +27,23 @@ import android.widget.ListView;
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensestracker.tracker.R;
 
-public class ExpensesListActivity extends ListActivity  {
+public class ExpensesListActivity extends ListActivity {
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-        Cursor cursor = getContentResolver().query(ExpenseDataContract.Expense.CONTENT_URI,
-                ExpenseDataContract.Expense.COLUMN_NAME_ALL, null, null, ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP + " DESC");
+    Cursor cursor = getContentResolver().query(ExpenseDataContract.Expense.CONTENT_URI,
+        ExpenseDataContract.Expense.COLUMN_NAME_ALL, null, null, ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP + " DESC");
 
-        ExpensesTransactionCursorAdapter adapter = new ExpensesTransactionCursorAdapter(this, R.layout.expeses_transactions_row, cursor, 0);
+    ExpensesTransactionCursorAdapter adapter = new ExpensesTransactionCursorAdapter(this, R.layout.expeses_transactions_row, cursor, 0);
 
-        setListAdapter(adapter);
-    }
+    setListAdapter(adapter);
+  }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        // Do something when a list item is clicked
-    }
+  @Override
+  public void onListItemClick(ListView l, View v, int position, long id) {
+    // Do something when a list item is clicked
+  }
 }

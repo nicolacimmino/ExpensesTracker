@@ -28,87 +28,86 @@ import com.nicolacimmino.expensestracker.tracker.ui.ExpensesListActivity;
 import com.nicolacimmino.expensestracker.tracker.ui.MainActivity;
 
 public class GcmIntentService extends IntentService {
-    public static final int NOTIFICATION_ID = 1;
-    private static final String TAG = "GcmIntentService" ;
-    private NotificationManager mNotificationManager;
-    NotificationCompat.Builder builder;
+  public static final int NOTIFICATION_ID = 1;
+  private static final String TAG = "GcmIntentService";
+  private NotificationManager mNotificationManager;
+  NotificationCompat.Builder builder;
 
-    public GcmIntentService() {
-        super("GcmIntentService");
-    }
+  public GcmIntentService() {
+    super("GcmIntentService");
+  }
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        Bundle extras = intent.getExtras();
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-        // The getMessageType() intent parameter must be the intent you received
-        // in your BroadcastReceiver.
-        String messageType = gcm.getMessageType(intent);
+  @Override
+  protected void onHandleIntent(Intent intent) {
+    Bundle extras = intent.getExtras();
+    GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+    // The getMessageType() intent parameter must be the intent you received
+    // in your BroadcastReceiver.
+    String messageType = gcm.getMessageType(intent);
 
-        if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
+    if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
             /*
              * Filter messages based on message type. Since it is likely that GCM
              * will be extended in the future with new message types, just ignore
              * any message types you're not interested in, or that you don't
              * recognize.
              */
-            if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-                sendNotification("Send error: " + extras.toString());
-            } else if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_DELETED.equals(messageType)) {
-                sendNotification("Deleted messages on server: " +
-                        extras.toString());
-                // If it's a regular GCM message, do some work.
-            } else if (GoogleCloudMessaging.
-                    MESSAGE_TYPE_MESSAGE.equals(messageType)) {
+      if (GoogleCloudMessaging.
+          MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
+        sendNotification("Send error: " + extras.toString());
+      } else if (GoogleCloudMessaging.
+          MESSAGE_TYPE_DELETED.equals(messageType)) {
+        sendNotification("Deleted messages on server: " +
+            extras.toString());
+        // If it's a regular GCM message, do some work.
+      } else if (GoogleCloudMessaging.
+          MESSAGE_TYPE_MESSAGE.equals(messageType)) {
 
-                //getApplicationContext().getContentResolver().notifyChange(ExpenseDataContract.Expense.CONTENT_URI, null, true);
-                getContentResolver().requestSync(getmAccount(), ExpenseDataContract.CONTENT_AUTHORITY, extras);
+        //getApplicationContext().getContentResolver().notifyChange(ExpenseDataContract.Expense.CONTENT_URI, null, true);
+        getContentResolver().requestSync(getmAccount(), ExpenseDataContract.CONTENT_AUTHORITY, extras);
 
-                // Post notification of received message.
-                sendNotification("Expenses updated!");
+        // Post notification of received message.
+        sendNotification("Expenses updated!");
 
-                Log.i(TAG, "Received: " + extras.toString());
-            }
-        }
-        // Release the wake lock provided by the WakefulBroadcastReceiver.
-        GcmBroadcastReceiver.completeWakefulIntent(intent);
+        Log.i(TAG, "Received: " + extras.toString());
+      }
     }
+    // Release the wake lock provided by the WakefulBroadcastReceiver.
+    GcmBroadcastReceiver.completeWakefulIntent(intent);
+  }
 
-    // TODO cleanup, rather get the account injected from caller or do something else.
-    // THis depends also on how we will decide to handle multiple acconts if supported at all.
-    private Account getmAccount()
-    {
-        Account theAccount;
-        AccountManager accountManager = AccountManager.get(this);
-        Account[] accounts =  accountManager.getAccountsByType(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
-        theAccount = accounts[0];
-        return theAccount;
-    }
+  // TODO cleanup, rather get the account injected from caller or do something else.
+  // THis depends also on how we will decide to handle multiple acconts if supported at all.
+  private Account getmAccount() {
+    Account theAccount;
+    AccountManager accountManager = AccountManager.get(this);
+    Account[] accounts = accountManager.getAccountsByType(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
+    theAccount = accounts[0];
+    return theAccount;
+  }
 
-    // Put the message into a notification and post it.
-    // This is just one simple example of what you might choose to do with
-    // a GCM message.
-    private void sendNotification(String msg) {
-        mNotificationManager = (NotificationManager)
-                this.getSystemService(Context.NOTIFICATION_SERVICE);
+  // Put the message into a notification and post it.
+  // This is just one simple example of what you might choose to do with
+  // a GCM message.
+  private void sendNotification(String msg) {
+    mNotificationManager = (NotificationManager)
+        this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, ExpensesListActivity.class), 0);
+    PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+        new Intent(this, ExpensesListActivity.class), 0);
 
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("Expenses Tracker")
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
-                        .setContentText(msg)
-                        .setAutoCancel(true)
-                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-                        .setLights(Color.rgb(219,70,0), 700, 1000)
-                        .setOnlyAlertOnce(true);
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this)
+            .setSmallIcon(R.drawable.ic_launcher)
+            .setContentTitle("Expenses Tracker")
+            .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
+            .setContentText(msg)
+            .setAutoCancel(true)
+            .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+            .setLights(Color.rgb(219, 70, 0), 700, 1000)
+            .setOnlyAlertOnce(true);
 
-        mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-    }
+    mBuilder.setContentIntent(contentIntent);
+    mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+  }
 }

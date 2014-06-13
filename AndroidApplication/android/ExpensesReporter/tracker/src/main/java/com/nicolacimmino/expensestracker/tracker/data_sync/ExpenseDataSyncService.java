@@ -29,32 +29,32 @@ import android.util.Log;
  */
 public class ExpenseDataSyncService extends Service {
 
-    private static ExpenseDataSyncAdapter syncAdapter = null;
-    private static final Object syncAdapterLock = new Object();
+  private static ExpenseDataSyncAdapter syncAdapter = null;
+  private static final Object syncAdapterLock = new Object();
 
-    // Tag used for logging so we can filter messages from this class.
-    public static final String TAG = "ExpenseDataSyncService";
+  // Tag used for logging so we can filter messages from this class.
+  public static final String TAG = "ExpenseDataSyncService";
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        synchronized (syncAdapterLock) {
-            if (syncAdapter == null) {
-                syncAdapter = new ExpenseDataSyncAdapter(getApplicationContext(), true);
-            }
-        }
-        Log.i(TAG, "Service created");
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    synchronized (syncAdapterLock) {
+      if (syncAdapter == null) {
+        syncAdapter = new ExpenseDataSyncAdapter(getApplicationContext(), true);
+      }
     }
+    Log.i(TAG, "Service created");
+  }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        Log.i(TAG, "Service bound to sync adapter");
-        return syncAdapter.getSyncAdapterBinder();
-    }
+  @Override
+  public IBinder onBind(Intent intent) {
+    Log.i(TAG, "Service bound to sync adapter");
+    return syncAdapter.getSyncAdapterBinder();
+  }
 
-    @Override
-    public void onDestroy() {
-        Log.i(TAG, "Service destroyed");
-        super.onDestroy();
-    }
+  @Override
+  public void onDestroy() {
+    Log.i(TAG, "Service destroyed");
+    super.onDestroy();
+  }
 }

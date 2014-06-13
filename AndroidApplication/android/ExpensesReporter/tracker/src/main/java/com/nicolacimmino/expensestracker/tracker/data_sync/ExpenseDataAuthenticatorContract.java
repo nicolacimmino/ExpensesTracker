@@ -20,6 +20,6 @@ package com.nicolacimmino.expensestracker.tracker.data_sync;
 
 public class ExpenseDataAuthenticatorContract {
 
-    public static final String ACCOUNT_TYPE = "expenses.nicolacimmino.com";
-    public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "expenses.nicolacimmino.com.full";
+  public static final String ACCOUNT_TYPE = "expenses.nicolacimmino.com";
+  public static final String AUTHTOKEN_TYPE_FULL_ACCESS = "expenses.nicolacimmino.com.full";
 }

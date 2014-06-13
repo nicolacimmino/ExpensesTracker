@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+
 import org.json.*;
 
 import com.nicolacimmino.expensestracker.tracker.ui.ExpenseDataLoginActivity;
@@ -42,170 +43,174 @@ import java.net.URL;
 
 public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
 
-    private static final String TAG = "ExpenseDataAuthenticator";
+  private static final String TAG = "ExpenseDataAuthenticator";
 
-    private Context mContext;
+  private Context mContext;
 
-    public ExpenseDataAuthenticator(Context context) {
-        super(context);
-        mContext = context;
-    }
-    // Editing properties is not supported
-    @Override
-    public Bundle editProperties(
-            AccountAuthenticatorResponse r, String s) {
-        throw new UnsupportedOperationException();
-    }
+  public ExpenseDataAuthenticator(Context context) {
+    super(context);
+    mContext = context;
+  }
 
-    // Invoked when a new account is to be added.
-    @Override
-    public Bundle addAccount(
-            AccountAuthenticatorResponse response,
-            String accountType,
-            String authTokenType,
-            String[] strings,
-            Bundle bundle) throws NetworkErrorException {
+  // Editing properties is not supported
+  @Override
+  public Bundle editProperties(
+      AccountAuthenticatorResponse r, String s) {
+    throw new UnsupportedOperationException();
+  }
 
-        // We want to start the ExpenseDataLoginActivity and pass info about the account
-        //  to be created. We don't start the activity here
-        //  but return a bundle for the AccountManager to actually start it.
-        final Intent intent = new Intent(mContext, ExpenseDataLoginActivity.class);
-        intent.putExtra(ExpenseDataLoginActivity.ARG_ACCOUNT_TYPE, accountType);
-        intent.putExtra(ExpenseDataLoginActivity.ARG_AUTH_TYPE, authTokenType);
-        intent.putExtra(ExpenseDataLoginActivity.ARG_IS_ADDING_NEW_ACCOUNT, true);
-        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-        final Bundle returnBundle = new Bundle();
-        returnBundle.putParcelable(AccountManager.KEY_INTENT, intent);
-        return returnBundle;
-    }
+  // Invoked when a new account is to be added.
+  @Override
+  public Bundle addAccount(
+      AccountAuthenticatorResponse response,
+      String accountType,
+      String authTokenType,
+      String[] strings,
+      Bundle bundle) throws NetworkErrorException {
 
-    // Ignore attempts to confirm credentials
-    @Override
-    public Bundle confirmCredentials(
-            AccountAuthenticatorResponse r,
-            Account account,
-            Bundle bundle) throws NetworkErrorException {
-        return null;
-    }
-    // Getting an authentication token is not supported
-    @Override
-    public Bundle getAuthToken(
-            AccountAuthenticatorResponse response,
-            Account account,
-            String authTokenType,
-            Bundle bundle) throws NetworkErrorException {
+    // We want to start the ExpenseDataLoginActivity and pass info about the account
+    //  to be created. We don't start the activity here
+    //  but return a bundle for the AccountManager to actually start it.
+    final Intent intent = new Intent(mContext, ExpenseDataLoginActivity.class);
+    intent.putExtra(ExpenseDataLoginActivity.ARG_ACCOUNT_TYPE, accountType);
+    intent.putExtra(ExpenseDataLoginActivity.ARG_AUTH_TYPE, authTokenType);
+    intent.putExtra(ExpenseDataLoginActivity.ARG_IS_ADDING_NEW_ACCOUNT, true);
+    intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+    final Bundle returnBundle = new Bundle();
+    returnBundle.putParcelable(AccountManager.KEY_INTENT, intent);
+    return returnBundle;
+  }
 
-        // Extract the username and password from the Account Manager, and ask
-        // the server for an appropriate AuthToken.
-        final AccountManager am = AccountManager.get(mContext);
+  // Ignore attempts to confirm credentials
+  @Override
+  public Bundle confirmCredentials(
+      AccountAuthenticatorResponse r,
+      Account account,
+      Bundle bundle) throws NetworkErrorException {
+    return null;
+  }
 
-        String authToken = am.peekAuthToken(account, authTokenType);
+  // Getting an authentication token is not supported
+  @Override
+  public Bundle getAuthToken(
+      AccountAuthenticatorResponse response,
+      Account account,
+      String authTokenType,
+      Bundle bundle) throws NetworkErrorException {
 
-        // Lets give another try to authenticate the user
-        if (TextUtils.isEmpty(authToken)) {
-            final String password = am.getPassword(account);
-            if (password != null) {
-                authToken = ExpenseDataAuthenticator.SignInUser(account.name, password, authTokenType);
-            }
-        }
+    // Extract the username and password from the Account Manager, and ask
+    // the server for an appropriate AuthToken.
+    final AccountManager am = AccountManager.get(mContext);
 
-        // If we get an authToken - we return it
-        if (!TextUtils.isEmpty(authToken)) {
-            final Bundle result = new Bundle();
-            result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-            result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-            result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
-            return result;
-        }
+    String authToken = am.peekAuthToken(account, authTokenType);
 
-        // If we get here, then we couldn't access the user's password - so we
-        // need to re-prompt them for their credentials. We do that by creating
-        // an intent to display our AuthenticatorActivity.
-        final Intent intent = new Intent(mContext, ExpenseDataLoginActivity.class);
-        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-        intent.putExtra(ExpenseDataLoginActivity.ARG_ACCOUNT_TYPE, account.type);
-        intent.putExtra(ExpenseDataLoginActivity.ARG_AUTH_TYPE, authTokenType);
-        final Bundle responseBundle = new Bundle();
-        responseBundle.putParcelable(AccountManager.KEY_INTENT, intent);
-        return responseBundle;
-    }
-    // Getting a label for the auth token is not supported
-    @Override
-    public String getAuthTokenLabel(String s) {
-        throw new UnsupportedOperationException();
-    }
-    // Updating user credentials is not supported
-    @Override
-    public Bundle updateCredentials(
-            AccountAuthenticatorResponse r,
-            Account account,
-            String s, Bundle bundle) throws NetworkErrorException {
-        throw new UnsupportedOperationException();
-    }
-    // Checking features for the account is not supported
-    @Override
-    public Bundle hasFeatures(
-            AccountAuthenticatorResponse r,
-            Account account, String[] strings) throws NetworkErrorException {
-        throw new UnsupportedOperationException();
+    // Lets give another try to authenticate the user
+    if (TextUtils.isEmpty(authToken)) {
+      final String password = am.getPassword(account);
+      if (password != null) {
+        authToken = ExpenseDataAuthenticator.SignInUser(account.name, password, authTokenType);
+      }
     }
 
-    public static String SignInUser(String name, String password, String authTokenType)
-    {
-        Log.i(TAG, "signInUser invoked");
-
-        String authToken = "";
-
-        HttpURLConnection connection = null;
-
-        try {
-            JSONObject authenticationData = new JSONObject();
-            authenticationData.put("username", name);
-            authenticationData.put("password", password);
-
-            byte[] postDataBytes = authenticationData.toString(0).getBytes("UTF-8");
-
-            URL url = new URL("http://expensesapi.nicolacimmino.com/users/" + name + "/auth_token");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("charset", "utf-8");
-            connection.setRequestProperty("Content-Length", "" + Integer.toString(postDataBytes.length));
-            connection.setUseCaches(false);
-
-            DataOutputStream wr = new DataOutputStream(connection.getOutputStream ());
-            wr.write(postDataBytes);
-            wr.flush();
-            wr.close();
-
-            int response = connection.getResponseCode();
-
-            InputStreamReader in = new InputStreamReader((InputStream) connection.getContent());
-            BufferedReader buff = new BufferedReader(in);
-            JSONObject authTokenJson = (JSONObject) new JSONTokener(buff.readLine().toString()).nextValue();
-            authToken = authTokenJson.getString("auth_token");
-            Log.i(TAG, String.valueOf(response));
-            connection.disconnect();
-        } catch (MalformedURLException e) {
-            Log.e(TAG, "URL is malformed", e);
-            return "";
-        } catch (IOException e) {
-            Log.e(TAG, "Error reading from network: " + e.toString());
-            return "";
-        } catch (JSONException e) {
-            Log.e(TAG, "Error creating json doc: " + e.toString());
-            return "";
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
-
-        Log.i(TAG, "Got token:" + authToken);
-
-        return authToken;
+    // If we get an authToken - we return it
+    if (!TextUtils.isEmpty(authToken)) {
+      final Bundle result = new Bundle();
+      result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+      result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+      result.putString(AccountManager.KEY_AUTHTOKEN, authToken);
+      return result;
     }
+
+    // If we get here, then we couldn't access the user's password - so we
+    // need to re-prompt them for their credentials. We do that by creating
+    // an intent to display our AuthenticatorActivity.
+    final Intent intent = new Intent(mContext, ExpenseDataLoginActivity.class);
+    intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+    intent.putExtra(ExpenseDataLoginActivity.ARG_ACCOUNT_TYPE, account.type);
+    intent.putExtra(ExpenseDataLoginActivity.ARG_AUTH_TYPE, authTokenType);
+    final Bundle responseBundle = new Bundle();
+    responseBundle.putParcelable(AccountManager.KEY_INTENT, intent);
+    return responseBundle;
+  }
+
+  // Getting a label for the auth token is not supported
+  @Override
+  public String getAuthTokenLabel(String s) {
+    throw new UnsupportedOperationException();
+  }
+
+  // Updating user credentials is not supported
+  @Override
+  public Bundle updateCredentials(
+      AccountAuthenticatorResponse r,
+      Account account,
+      String s, Bundle bundle) throws NetworkErrorException {
+    throw new UnsupportedOperationException();
+  }
+
+  // Checking features for the account is not supported
+  @Override
+  public Bundle hasFeatures(
+      AccountAuthenticatorResponse r,
+      Account account, String[] strings) throws NetworkErrorException {
+    throw new UnsupportedOperationException();
+  }
+
+  public static String SignInUser(String name, String password, String authTokenType) {
+    Log.i(TAG, "signInUser invoked");
+
+    String authToken = "";
+
+    HttpURLConnection connection = null;
+
+    try {
+      JSONObject authenticationData = new JSONObject();
+      authenticationData.put("username", name);
+      authenticationData.put("password", password);
+
+      byte[] postDataBytes = authenticationData.toString(0).getBytes("UTF-8");
+
+      URL url = new URL("http://expensesapi.nicolacimmino.com/users/" + name + "/auth_token");
+      connection = (HttpURLConnection) url.openConnection();
+      connection.setDoOutput(true);
+      connection.setDoInput(true);
+      connection.setInstanceFollowRedirects(false);
+      connection.setRequestMethod("POST");
+      connection.setRequestProperty("Content-Type", "application/json");
+      connection.setRequestProperty("charset", "utf-8");
+      connection.setRequestProperty("Content-Length", "" + Integer.toString(postDataBytes.length));
+      connection.setUseCaches(false);
+
+      DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+      wr.write(postDataBytes);
+      wr.flush();
+      wr.close();
+
+      int response = connection.getResponseCode();
+
+      InputStreamReader in = new InputStreamReader((InputStream) connection.getContent());
+      BufferedReader buff = new BufferedReader(in);
+      JSONObject authTokenJson = (JSONObject) new JSONTokener(buff.readLine().toString()).nextValue();
+      authToken = authTokenJson.getString("auth_token");
+      Log.i(TAG, String.valueOf(response));
+      connection.disconnect();
+    } catch (MalformedURLException e) {
+      Log.e(TAG, "URL is malformed", e);
+      return "";
+    } catch (IOException e) {
+      Log.e(TAG, "Error reading from network: " + e.toString());
+      return "";
+    } catch (JSONException e) {
+      Log.e(TAG, "Error creating json doc: " + e.toString());
+      return "";
+    } finally {
+      if (connection != null) {
+        connection.disconnect();
+      }
+    }
+
+    Log.i(TAG, "Got token:" + authToken);
+
+    return authToken;
+  }
 }
