@@ -29,6 +29,8 @@ import android.provider.BaseColumns;
 public class ExpenseDataContract {
 
   // This is the content authority that applications will use to invoke our content provider.
+  // If you change this you *must* change it also in the manifest in the android:authorities
+  // property of the related provider section.
   public static final String CONTENT_AUTHORITY = "com.nicolacimmino.expensestracker.provider";
 
   // The base URI of all resources exposed by this content provider.

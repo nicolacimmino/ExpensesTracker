@@ -26,21 +26,26 @@ import android.net.Uri;
 
 
 /**
- * Content provider for expenses data.
+ * Content Provider for expenses data.
+ * Provides CRUD methods that expose the locally stored expenses data.
+ *
+ * Self-study note:
+ * Content providers expose data for the application but also for other applications. Scope is
+ * controlled in the manifest. We could make this provider public and then other applications
+ * could access our expense data just knowing the content provider authority (declared in the
+ * manifest as well). This is how Android provides for instance contact data or gallery images
+ * to applications.
  */
 public class ExpensesDataContentProvider extends ContentProvider {
 
-  // This is an instance of the database helper which is used
-  //  to access data in the actual SQLite database.
+  // The database helper performs the actual access to the database.
   ExpensesSQLiteHelper mDataBaseHelper;
 
-  // ID for the route /expenses
+  // IDs for the various routes (data URIs).
   public static final int ROUTE_EXPENSES = 1;
-
-  // ID for the route /expenses/ID
   public static final int ROUTE_EXPENSES_ID = 2;
 
-  // This is the URI matcher that is used to resolve a route to its ID.
+  // This is the URI matcher that is used to resolve a URI route to a numeric ID.
   private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
   static {
@@ -70,6 +75,16 @@ public class ExpensesDataContentProvider extends ContentProvider {
     }
   }
 
+  // Self-study note:
+  // Each of the query, insert, update, delete methods performs one of the CRUD operations
+  // either on a specific expense or all expenses (where sensible). The pattern is always
+  // to choose the operation to perform based on the URI. Then for query we return a cursor
+  // that has the notification URI set to the URI of the data and of the other methods we
+  // notify the eventual observers that there has been a change in data originated by that
+  // URI. A an activity that shows the result of a query in a list, for instance, could
+  // listen for these notifications and refresh itself if the underlying data is changed.
+  // Of course this works only if data is changed through the ContentProvider.
+
   @Override
   public Cursor query(Uri uri, String[] projection, String selection,
                       String[] selectionArgs, String sortOrder) {
@@ -78,32 +93,36 @@ public class ExpensesDataContentProvider extends ContentProvider {
     int match = sUriMatcher.match(uri);
     switch (match) {
       case ROUTE_EXPENSES:
-        cursor = db.query(ExpenseDataContract.Expense.TABLE_NAME,   // Table
-            projection,                             // Columns
-            selection,                              // Selection
-            selectionArgs,                          // Selection args
-            null,                                   // Group by
-            null,                                   // Having
-            sortOrder);                             // Sort order
+        // Caller wants all expenses.
+        cursor = db.query(ExpenseDataContract.Expense.TABLE_NAME,
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            sortOrder);
 
-        // We set here the notification URI for the cursor
+        // Set the URI to watch for eventual data changes.
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
         return cursor;
+
       case ROUTE_EXPENSES_ID:
+        // Caller wants a specific expense.
         String id = uri.getLastPathSegment();
-        cursor = db.query(ExpenseDataContract.Expense.TABLE_NAME,       // Table
-            projection,                                                     // Columns
-            "WHERE " + ExpenseDataContract.Expense.COLUMN_NAME_ID + "=?",   // Selection
-            new String[]{id},                                               // Selection args
-            null,                                                           // Group by
-            null,                                                           // Having
-            null);                                                          // Sort order
+        cursor = db.query(ExpenseDataContract.Expense.TABLE_NAME,
+            projection,
+            "WHERE " + ExpenseDataContract.Expense.COLUMN_NAME_ID + "=?",
+            new String[]{id},
+            null,
+            null,
+            null);
 
-        // We set here the notification URI for the cursor
+        // Set the URI to watch for eventual data changes.
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
         return cursor;
+
       default:
         throw new UnsupportedOperationException("Unknonw URI: " + uri);
     }
@@ -116,6 +135,7 @@ public class ExpensesDataContentProvider extends ContentProvider {
     Uri result;
     switch (match) {
       case ROUTE_EXPENSES:
+        // Caller wants to insert one expense.
         long id = db.insertOrThrow(ExpenseDataContract.Expense.TABLE_NAME, null, contentValues);
         result = Uri.parse(ExpenseDataContract.Expense.CONTENT_URI + "/" + id);
         break;
@@ -125,7 +145,9 @@ public class ExpensesDataContentProvider extends ContentProvider {
         throw new UnsupportedOperationException("Unknown URI: " + uri);
     }
 
+    // Inform eventual observers that data related to this URI changed.
     getContext().getContentResolver().notifyChange(uri, null, false);
+
     return result;
   }
 
