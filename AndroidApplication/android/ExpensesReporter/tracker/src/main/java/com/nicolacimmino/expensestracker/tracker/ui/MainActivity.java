@@ -250,6 +250,7 @@ public class MainActivity extends Activity {
             }
 
             Bundle extras = new Bundle();
+            extras.putString("reg_id", getSharedPreferences(MainActivity.class.getSimpleName(),Context.MODE_PRIVATE).getString(GcmRegistration.PROPERTY_REG_ID, ""));
             getContentResolver().requestSync(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, extras);
         }
         catch(Exception e)

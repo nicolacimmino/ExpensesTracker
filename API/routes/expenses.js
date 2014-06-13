@@ -89,7 +89,8 @@ router.post('/:username', function(req, res) {
   var db = req.db;
   var username = req.params.username;
   var auth_token =  req.query.auth_token;
-    
+  var reporter_gcm_reg_id = req.body.reporter_gcm_reg_id;
+  
   accessControl.authorizeCreate(username, auth_token, 
       function onAllowed() {
         try {
@@ -102,7 +103,7 @@ router.post('/:username', function(req, res) {
           expense.timestamp = req.body.timestamp;
           
           db.collection('transactions').insert(expense,{}, function(e,docs){
-            gcmService.notifyUserMobiles(db,username);
+            gcmService.notifyUserMobiles(db,username, reporter_gcm_reg_id);
             res.send(200);
           });
         } catch (Exception) {

@@ -31,6 +31,7 @@ import android.util.Log;
 import org.json.*;
 
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
+import com.nicolacimmino.expensestracker.tracker.gcm.GcmRegistration;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -90,8 +91,9 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
         while(expenses.moveToNext()) {
             HttpURLConnection connection = null;
             try {
-                Log.i(TAG, "Posting one item");
+                Log.i(TAG, "Posting one item on behalf of:" +  extras.getString("reg_id"));
 
+                // TODO: move json field names to a contract.
                 JSONObject authenticationData = new JSONObject();
                 authenticationData.put("notes", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION)));
                 authenticationData.put("currency", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY)));
@@ -99,7 +101,7 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
                 authenticationData.put("destination", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION)));
                 authenticationData.put("source", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE)));
                 authenticationData.put("timestamp", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP)));
-
+                authenticationData.put("reporter_gcm_reg_id", extras.getString("reg_id"));
                 byte[] postDataBytes = authenticationData.toString(0).getBytes("UTF-8");
 
                 URL url = new URL("http://expensesapi.nicolacimmino.com/expenses/nicola?auth_token=" + authToken);

@@ -22,27 +22,27 @@ var GCM = require('gcm').GCM;
 var GCMapiKey = require('./applicationSecrets').GCMapiKey;
 var gcm = new GCM(GCMapiKey);
 
-module.exports.notifyUserMobiles = function(db, username) {
+module.exports.notifyUserMobiles = function(db, username, reporter_gcm_reg_id) {
   db.collection('mobiles').find({ username: username },{}, function(e,docs){
        
         try {
           for(ix=0; ix<docs.length; ix++) {
-            
-            var message = {
-                registration_id: docs[ix].gcmRegistrationId,
-                collapse_key: 'expenses_update', 
-                'data.key1': 'none',
-                'data.key2': 'none'
-            };
+            if(docs[ix].gcmRegistrationId != reporter_gcm_reg_id) {
+              var message = {
+                  registration_id: docs[ix].gcmRegistrationId,
+                  collapse_key: 'expenses_update', 
+                  'data.key1': 'none',
+                  'data.key2': 'none'
+              };
 
-            gcm.send(message, function(err, messageId){
-                if (err) {
-                    console.log("Something has gone wrong!");
-                } else {
-                    console.log("Sent with message ID: ", messageId);
-                }
-            });
-            
+              gcm.send(message, function(err, messageId){
+                  if (err) {
+                      console.log("Something has gone wrong!");
+                  } else {
+                      console.log("Sent with message ID: ", messageId);
+                  }
+              });
+            }
           }
         } catch (e) {
           res.send(401);
