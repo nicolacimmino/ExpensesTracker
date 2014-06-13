@@ -18,7 +18,6 @@
 
 package com.nicolacimmino.expensestracker.tracker.ui;
 
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -27,16 +26,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.nicolacimmino.expensestracker.tracker.R;
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticatorContract;
@@ -49,26 +44,11 @@ public class MainActivity extends Activity {
   // Tag used in logs.
   private static final String TAG = "MainActivity";
 
-  // Name of the settings where we save the last UI settings.
-  private final static String SAVED_STATE_LAST_SOURCE = "last_source";
-  private final static String SAVED_STATE_LAST_DESTINATION = "last_destination";
-
-  private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
-  /*
-   *
-   */
   protected void onCreate(Bundle savedInstanceState) {
 
     super.onCreate(savedInstanceState);
+
     setContentView(R.layout.activity_main);
-
-
-    GcmRegistration gcmRegistration = new GcmRegistration(getApplicationContext(),
-        getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE));
-
-    // Ensure we are registered to gcm
-    gcmRegistration.Register();
 
     // Add values to the source spinner.
     Spinner sourceSpinner = (Spinner) findViewById(R.id.sourceSpinner);
@@ -77,6 +57,14 @@ public class MainActivity extends Activity {
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     sourceSpinner.setAdapter(adapter);
 
+    // Recover from preferences the last used source.
+    String lastSource = getPreferences(MODE_PRIVATE)
+        .getString(SharedPreferencesContract.SAVED_STATE_LAST_SOURCE, "");
+    if (lastSource != "") {
+      sourceSpinner.setSelection(((ArrayAdapter) sourceSpinner.getAdapter())
+          .getPosition(lastSource));
+    }
+
     // Add values to the destination spinner.
     Spinner destinationSpinner = (Spinner) findViewById(R.id.destinationSpinner);
     adapter = ArrayAdapter.createFromResource(this,
@@ -84,32 +72,20 @@ public class MainActivity extends Activity {
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     destinationSpinner.setAdapter(adapter);
 
-    // Recover from preferences the last used values in UI and restore them if available.
-    SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-    String lastSource = preferences.getString(SAVED_STATE_LAST_SOURCE, "");
-    String lastDestination = preferences.getString(SAVED_STATE_LAST_DESTINATION, "");
-
-    if (lastSource != "") {
-      sourceSpinner.setSelection(((ArrayAdapter) sourceSpinner.getAdapter())
-          .getPosition(lastSource));
-    }
-
+    // Recover from preferences the last used destination.
+    String lastDestination = getPreferences(MODE_PRIVATE)
+        .getString(SharedPreferencesContract.SAVED_STATE_LAST_DESTINATION, "");
     if (lastDestination != "") {
       destinationSpinner.setSelection(((ArrayAdapter) destinationSpinner.getAdapter())
           .getPosition(lastDestination));
     }
 
-    // Inject context in the Expenses account resolver.
-    ExpensesAccountResolver.getInstance().SetContext(getApplicationContext());
-
-    // If we don't have an account yet ask first account manager to have the user
-    //  creating one.
-    if(ExpensesAccountResolver.getInstance().getAccount() == null) {
+    // If we don't have an account yet ask first account manager to have the user to create one.
+    // So we show immediatley the ExpensesDataLoginActivity before the user can proceed.
+    if (ExpensesAccountResolver.getInstance().getAccount() == null) {
       AccountManager.get(this).addAccount(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE,
           ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS,
           null, null, this, null, null);
-    } else {
-      gcmRegistration.SendRegistrationIdToBackend(ExpensesAccountResolver.getInstance().getAccount());
     }
   }
 
@@ -121,20 +97,18 @@ public class MainActivity extends Activity {
     Spinner sourceSpinner = (Spinner) findViewById(R.id.sourceSpinner);
     Spinner destinationSpinner = (Spinner) findViewById(R.id.destinationSpinner);
 
-    SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-    SharedPreferences.Editor editor = preferences.edit();
-    editor.putString(SAVED_STATE_LAST_SOURCE, sourceSpinner.getSelectedItem().toString());
-    editor.putString(SAVED_STATE_LAST_DESTINATION, destinationSpinner.getSelectedItem().toString());
+    SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+    editor.putString(SharedPreferencesContract.SAVED_STATE_LAST_SOURCE, sourceSpinner.getSelectedItem().toString());
+    editor.putString(SharedPreferencesContract.SAVED_STATE_LAST_DESTINATION, destinationSpinner.getSelectedItem().toString());
     editor.commit();
   }
 
   /*
    * Action bar created.
+   * We must here inflate its content.
    */
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-
-    // Inflate the menu adding items to the action bar.
     getMenuInflater().inflate(R.menu.main, menu);
     return true;
   }
@@ -164,7 +138,7 @@ public class MainActivity extends Activity {
 
 
   /*
-   * User clicked on "OK" to confirm the transaction.
+   * User clicked to confirm the transaction.
    * Here we save the new transaction and give user visual feedback.
    */
   public void onTransactionConfirmClick() {
@@ -194,7 +168,6 @@ public class MainActivity extends Activity {
       values.put(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION, destinationSpinner.getSelectedItem().toString());
       values.put(ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION, notesView.getText().toString());
       values.put(ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY, currencyView.getText().toString());
-
       getContentResolver().insert(ExpenseDataContract.Expense.CONTENT_URI, values);
 
       // Clear the input fields so the interface is ready for another operation.
@@ -205,7 +178,9 @@ public class MainActivity extends Activity {
       // We show a toast as visual feedback that something has happened.
       Toast.makeText(getApplicationContext(), getString(R.string.saved), Toast.LENGTH_SHORT).show();
 
-      getContentResolver().requestSync(ExpensesAccountResolver.getInstance().getAccount(), ExpenseDataContract.CONTENT_AUTHORITY, new Bundle());
+      // Request to sync data with the backend
+      ContentResolver.requestSync(ExpensesAccountResolver.getInstance().getAccount(), ExpenseDataContract.CONTENT_AUTHORITY, new Bundle());
+
     } catch (Exception e) {
       e.printStackTrace();
     }

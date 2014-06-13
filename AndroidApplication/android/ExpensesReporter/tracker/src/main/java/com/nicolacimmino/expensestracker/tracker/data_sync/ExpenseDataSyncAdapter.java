@@ -94,7 +94,8 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
             GcmRegistration.getRegistration_id());
         byte[] postDataBytes = authenticationData.toString(0).getBytes("UTF-8");
 
-        URL url = new URL(ExpensesAPIContract.URL + "/" + account.name + "?auth_token=" + authToken);
+        Log.i(TAG, "Account name:" + account.name);
+        URL url = new URL(ExpensesAPIContract.URL + "/expenses/" + account.name + "?auth_token=" + authToken);
         connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setDoInput(true);

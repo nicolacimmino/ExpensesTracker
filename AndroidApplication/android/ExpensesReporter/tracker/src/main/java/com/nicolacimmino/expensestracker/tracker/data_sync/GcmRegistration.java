@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.nicolacimmino.expensestracker.tracker.ui.SharedPreferencesContract;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,9 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class GcmRegistration {
 
-  public static final String EXTRA_MESSAGE = "message";
-  public static final String PROPERTY_REG_ID = "registration_id";
-  private static final String PROPERTY_APP_VERSION = "appVersion";
   String SENDER_ID = "958439099682";
 
   GoogleCloudMessaging gcm;
@@ -66,7 +64,7 @@ public class GcmRegistration {
    * If result is empty, the app needs to register.
    */
   private String getRegistrationId() {
-    String registrationId = mSharedPreferences.getString(PROPERTY_REG_ID, "");
+    String registrationId = mSharedPreferences.getString(SharedPreferencesContract.PROPERTY_REG_ID, "");
     if (registrationId.isEmpty()) {
       Log.i(TAG, "Registration not found.");
       return "";
@@ -74,7 +72,7 @@ public class GcmRegistration {
     // Check if app was updated; if so, it must clear the registration ID
     // since the existing regID is not guaranteed to work with the new
     // app version.
-    int registeredVersion = mSharedPreferences.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
+    int registeredVersion = mSharedPreferences.getInt(SharedPreferencesContract.PROPERTY_APP_VERSION, Integer.MIN_VALUE);
     int currentVersion = getAppVersion(mContext);
     if (registeredVersion != currentVersion) {
       Log.i(TAG, "App version changed.");
@@ -87,8 +85,8 @@ public class GcmRegistration {
     int appVersion = getAppVersion(mContext);
     Log.i(TAG, "Saving regId on app version " + appVersion);
     SharedPreferences.Editor editor = mSharedPreferences.edit();
-    editor.putString(PROPERTY_REG_ID, regId);
-    editor.putInt(PROPERTY_APP_VERSION, appVersion);
+    editor.putString(SharedPreferencesContract.PROPERTY_REG_ID, regId);
+    editor.putInt(SharedPreferencesContract.PROPERTY_APP_VERSION, appVersion);
     editor.commit();
   }
 

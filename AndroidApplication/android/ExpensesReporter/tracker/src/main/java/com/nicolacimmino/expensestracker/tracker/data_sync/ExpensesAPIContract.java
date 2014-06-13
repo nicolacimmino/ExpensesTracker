@@ -8,7 +8,7 @@ public class ExpensesAPIContract {
   // The base URL of the API
   // NOTE: this is purely for testing, DO NOT deploy a live system on HTTP,
   //  user passwords will be sent in clear over the wire.
-  public static final String URL = "http://expenses.nicolacimmino.com";
+  public static final String URL = "http://expensesapi.nicolacimmino.com";
 
   // The expense object JSON field names.
   public class Expense {

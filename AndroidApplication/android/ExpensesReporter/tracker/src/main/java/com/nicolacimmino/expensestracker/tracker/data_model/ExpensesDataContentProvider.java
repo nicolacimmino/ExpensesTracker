@@ -18,11 +18,15 @@
 package com.nicolacimmino.expensestracker.tracker.data_model;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
+
+import com.nicolacimmino.expensestracker.tracker.data_sync.ExpensesAccountResolver;
 
 
 /**
@@ -171,6 +175,7 @@ public class ExpensesDataContentProvider extends ContentProvider {
     }
 
     getContext().getContentResolver().notifyChange(uri, null, false);
+
     return rowsAffected;
   }
 
@@ -198,6 +203,7 @@ public class ExpensesDataContentProvider extends ContentProvider {
     }
 
     getContext().getContentResolver().notifyChange(uri, null, false);
+
     return rowsAffected;
   }
 }
