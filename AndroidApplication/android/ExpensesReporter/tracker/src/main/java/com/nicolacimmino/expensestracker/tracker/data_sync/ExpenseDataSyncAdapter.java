@@ -28,14 +28,9 @@ import android.content.SyncResult;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
-
 import org.json.*;
-
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
-import com.nicolacimmino.expensestracker.tracker.gcm.GcmRegistration;
-
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -62,20 +57,14 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
   }
 
 
-  public void onPerformSync(
-      Account account,
-      Bundle extras,
-      String authority,
-      ContentProviderClient provider,
-      SyncResult syncResult) {
+  public void onPerformSync(Account account,Bundle extras,
+      String authority,ContentProviderClient provider, SyncResult syncResult) {
 
-    Log.i(TAG, "Sync for: " + account.name);
     String authToken = "";
     try {
       authToken = mAccountManager.blockingGetAuthToken(account, ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
     } catch (Exception e) {
-      //syncResult.stats.numAuthExceptions++;
-      Log.i("", "Exception on get auth token");
+      // We couldn't get an auth token, we fail the sync.
       syncResult.stats.numAuthExceptions++;
       return;
     }
@@ -83,10 +72,7 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
     // Get expenses that are not yet synced with the server.
     Cursor expenses = getContext().getContentResolver().query(ExpenseDataContract.Expense.CONTENT_URI,
         ExpenseDataContract.Expense.COLUMN_NAME_ALL,
-        ExpenseDataContract.Expense.COLUMN_NAME_SYNC + "=?",
-        new String[]{"0"},
-        null);
-    Log.i(TAG, "Starting sync");
+        ExpenseDataContract.Expense.COLUMN_NAME_SYNC + "=?", new String[]{"0"}, null);
 
     while (expenses.moveToNext()) {
       HttpURLConnection connection = null;
@@ -105,10 +91,10 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
         authenticationData.put(ExpensesAPIContract.Expense.TIMESTAMP,
             expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP)));
         authenticationData.put(ExpensesAPIContract.Expense.REPORTER_GCM_REG_ID,
-            extras.getString("reg_id"));
+            GcmRegistration.getRegistration_id());
         byte[] postDataBytes = authenticationData.toString(0).getBytes("UTF-8");
 
-        URL url = new URL("http://expensesapi.nicolacimmino.com/expenses/nicola?auth_token=" + authToken);
+        URL url = new URL(ExpensesAPIContract.URL + "/" + account.name + "?auth_token=" + authToken);
         connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setDoInput(true);

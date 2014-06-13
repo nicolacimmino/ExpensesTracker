@@ -1,8 +1,7 @@
-package com.nicolacimmino.expensestracker.tracker.gcm;
+package com.nicolacimmino.expensestracker.tracker.data_sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -11,8 +10,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
-import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticatorContract;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,8 +34,16 @@ public class GcmRegistration {
   GoogleCloudMessaging gcm;
   AtomicInteger msgId = new AtomicInteger();
   Context mContext;
-  String registrationId;
+  private static String registration_id;
   SharedPreferences mSharedPreferences;
+
+  static {
+    registration_id = "";
+  }
+
+  public static String getRegistration_id() {
+    return registration_id;
+  }
 
   private static final String TAG = "GcmRegistration";
 
@@ -49,9 +54,9 @@ public class GcmRegistration {
 
   public void Register() {
     gcm = GoogleCloudMessaging.getInstance(mContext);
-    registrationId = getRegistrationId();
+    registration_id = getRegistrationId();
 
-    if (registrationId.isEmpty()) {
+    if (registration_id.isEmpty()) {
       registerInBackground();
     }
   }
@@ -109,10 +114,10 @@ public class GcmRegistration {
           if (gcm == null) {
             gcm = GoogleCloudMessaging.getInstance(mContext);
           }
-          registrationId = gcm.register(SENDER_ID);
-          msg = "Device registered, registration ID=" + registrationId;
+          registration_id = gcm.register(SENDER_ID);
+          msg = "Device registered, registration ID=" + registration_id;
           // Persist the regID - no need to register again.
-          storeRegistrationId(registrationId);
+          storeRegistrationId(registration_id);
         } catch (IOException ex) {
           msg = "Error :" + ex.getMessage();
           // If there is an error, don't just keep trying to register.
@@ -162,7 +167,7 @@ public class GcmRegistration {
           Log.i(TAG, "Sendig gcm registration id to the expenses API");
 
           JSONObject reportData = new JSONObject();
-          reportData.put("gcmRegistrationId", registrationId);
+          reportData.put("gcmRegistrationId", registration_id);
 
           byte[] postDataBytes = reportData.toString(0).getBytes("UTF-8");
 

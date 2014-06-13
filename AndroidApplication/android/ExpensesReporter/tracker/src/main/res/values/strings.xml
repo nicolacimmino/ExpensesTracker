@@ -42,4 +42,6 @@
     <string name="error_amount">Secify an amount</string>
     <string name="saved">Saved</string>
     <string name="error_saving">Error saving data.</string>
+    <string name="notification_data_changed">Expenses data changed.</string>
+
 </resources>

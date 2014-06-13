@@ -66,14 +66,14 @@
 
 
         <receiver
-            android:name=".gcm.GcmBroadcastReceiver"
+            android:name=".data_sync.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <category android:name="com.nicolacimmino.expensestracker.tracker" />
             </intent-filter>
         </receiver>
-        <service android:name=".gcm.GcmIntentService">
+        <service android:name=".data_sync.GcmIntentService">
           </service>
 
     </application>

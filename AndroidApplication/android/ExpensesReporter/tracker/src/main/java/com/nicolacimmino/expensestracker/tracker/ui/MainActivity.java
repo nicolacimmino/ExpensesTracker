@@ -26,9 +26,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -40,15 +37,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nicolacimmino.expensestracker.tracker.R;
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticatorContract;
-import com.nicolacimmino.expensestracker.tracker.gcm.GcmRegistration;
-
-import java.io.IOException;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.nicolacimmino.expensestracker.tracker.data_sync.ExpensesAccountResolver;
+import com.nicolacimmino.expensestracker.tracker.data_sync.GcmRegistration;
 
 
 public class MainActivity extends Activity {
@@ -56,17 +49,11 @@ public class MainActivity extends Activity {
   // Tag used in logs.
   private static final String TAG = "MainActivity";
 
-  private ContentResolver mResolver;
-
-  private Account mAccount;
-
   // Name of the settings where we save the last UI settings.
   private final static String SAVED_STATE_LAST_SOURCE = "last_source";
   private final static String SAVED_STATE_LAST_DESTINATION = "last_destination";
 
   private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
-
-  Context mContext;
 
   /*
    *
@@ -76,14 +63,8 @@ public class MainActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    if (!checkPlayServices()) {
-      finish();
-      return;
-    }
 
-    mContext = getApplicationContext();
-
-    GcmRegistration gcmRegistration = new GcmRegistration(mContext,
+    GcmRegistration gcmRegistration = new GcmRegistration(getApplicationContext(),
         getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE));
 
     // Ensure we are registered to gcm
@@ -118,35 +99,18 @@ public class MainActivity extends Activity {
           .getPosition(lastDestination));
     }
 
-    mAccount = getmAccount();
+    // Inject context in the Expenses account resolver.
+    ExpensesAccountResolver.getInstance().SetContext(getApplicationContext());
 
-    gcmRegistration.SendRegistrationIdToBackend(mAccount);
-  }
-
-  private Account getmAccount() {
-    Account theAccount;
-
-    AccountManager accountManager = AccountManager.get(this);
-    Account[] accounts = accountManager.getAccountsByType(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
-
-    Log.i(TAG, "Accounts:" + accounts.length);
-
-    if (accounts.length == 0) {
-      // There is no account, we need to ask user to set one up.
-      Toast.makeText(mContext, "Create account!", Toast.LENGTH_SHORT).show();
-      accountManager.addAccount(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE,
+    // If we don't have an account yet ask first account manager to have the user
+    //  creating one.
+    if(ExpensesAccountResolver.getInstance().getAccount() == null) {
+      AccountManager.get(this).addAccount(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE,
           ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS,
           null, null, this, null, null);
-      return null;
     } else {
-      theAccount = accounts[0];
+      gcmRegistration.SendRegistrationIdToBackend(ExpensesAccountResolver.getInstance().getAccount());
     }
-
-    // Turn on automatic syncing for the default account and authority
-    ContentResolver.setIsSyncable(theAccount, ExpenseDataContract.CONTENT_AUTHORITY, 1);
-    mResolver.setSyncAutomatically(theAccount, ExpenseDataContract.CONTENT_AUTHORITY, true);
-
-    return theAccount;
   }
 
   @Override
@@ -239,36 +203,11 @@ public class MainActivity extends Activity {
       amountView.requestFocus();
 
       // We show a toast as visual feedback that something has happened.
-      Toast.makeText(mContext, getString(R.string.saved), Toast.LENGTH_SHORT).show();
+      Toast.makeText(getApplicationContext(), getString(R.string.saved), Toast.LENGTH_SHORT).show();
 
-      if (mAccount == null) {
-        mAccount = getmAccount();
-      }
-
-      Bundle extras = new Bundle();
-      extras.putString("reg_id", getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE).getString(GcmRegistration.PROPERTY_REG_ID, ""));
-      getContentResolver().requestSync(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, extras);
+      getContentResolver().requestSync(ExpensesAccountResolver.getInstance().getAccount(), ExpenseDataContract.CONTENT_AUTHORITY, new Bundle());
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
-
-  /*
-   * Make sure GooglePlayServices is installed.
-   */
-  private boolean checkPlayServices() {
-    int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-    if (resultCode != ConnectionResult.SUCCESS) {
-      if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-        GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-            PLAY_SERVICES_RESOLUTION_REQUEST).show();
-      } else {
-        Log.i(TAG, "This device is not supported.");
-        finish();
-      }
-      return false;
-    }
-    return true;
-  }
-
 }

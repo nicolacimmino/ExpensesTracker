@@ -27,9 +27,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
 
   public static final String DATABASE_NAME = "Expenses";
+
+  // This is the database schema version. If changes are made to the schema
+  // this must be increased. On OnUpdate will take care to update eventual
+  // existing databases to match the new schema.
   public static final int DATABASE_VERSION = 7;
 
-  // Statement to create the database.
+  // Database creation statement.
   private static final String DATABASE_CREATE = "create table "
       + ExpenseDataContract.Expense.TABLE_NAME + "("
       + ExpenseDataContract.Expense.COLUMN_NAME_ID + " integer primary key autoincrement, "

@@ -26,6 +26,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentResolver;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nicolacimmino.expensestracker.tracker.R;
+import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticator;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticatorContract;
 
@@ -288,6 +290,11 @@ public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity imple
 
       if (accountManager.addAccountExplicitly(newAccount, mPassword, null)) {
         accountManager.setAuthToken(newAccount, ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, authToken);
+
+        // Turn on automatic syncing for the new account.
+        ContentResolver.setIsSyncable(newAccount, ExpenseDataContract.CONTENT_AUTHORITY, 1);
+        ContentResolver.setSyncAutomatically(newAccount, ExpenseDataContract.CONTENT_AUTHORITY, true);
+
         return true;
       } else {
         return false;
