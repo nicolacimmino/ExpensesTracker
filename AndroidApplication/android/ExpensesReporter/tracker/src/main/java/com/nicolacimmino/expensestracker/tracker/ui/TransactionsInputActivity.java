@@ -33,8 +33,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.nicolacimmino.expensestracker.tracker.R;
 import com.nicolacimmino.expensestracker.tracker.SharedPreferencesContract;
-import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
-import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticatorContract;
+import com.nicolacimmino.expensestracker.tracker.data_model.ExpensesDataContentProvider;
+import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseAPIAuthenticator;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpensesAccountResolver;
 
 
@@ -80,10 +80,10 @@ public class TransactionsInputActivity extends Activity {
     }
 
     // If we don't have an account yet ask first account manager to have the user to create one.
-    // So we show immediatley the ExpensesDataLoginActivity before the user can proceed.
+    // This will show immediatley the ExpensesDataLoginActivity before the user can proceed.
     if (ExpensesAccountResolver.getInstance().getAccount() == null) {
-      AccountManager.get(this).addAccount(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE,
-          ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS,
+      AccountManager.get(this).addAccount(ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.ACCOUNT_TYPE,
+          ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS,
           null, null, this, null, null);
     }
   }
@@ -162,12 +162,12 @@ public class TransactionsInputActivity extends Activity {
 
       // Prepare values and invoke insert on the Expense Data Content Provider
       ContentValues values = new ContentValues();
-      values.put(ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT, amountView.getText().toString());
-      values.put(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE, sourceSpinner.getSelectedItem().toString());
-      values.put(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION, destinationSpinner.getSelectedItem().toString());
-      values.put(ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION, notesView.getText().toString());
-      values.put(ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY, currencyView.getText().toString());
-      getContentResolver().insert(ExpenseDataContract.Expense.CONTENT_URI, values);
+      values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_AMOUNT, amountView.getText().toString());
+      values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_SOURCE, sourceSpinner.getSelectedItem().toString());
+      values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_DESTINATION, destinationSpinner.getSelectedItem().toString());
+      values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_DESCRIPTION, notesView.getText().toString());
+      values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_CURRENCY, currencyView.getText().toString());
+      getContentResolver().insert(ExpensesDataContentProvider.Contract.Expense.CONTENT_URI, values);
 
       // Clear the input fields so the interface is ready for another operation.
       amountView.setText("");
@@ -178,7 +178,7 @@ public class TransactionsInputActivity extends Activity {
       Toast.makeText(getApplicationContext(), getString(R.string.saved), Toast.LENGTH_SHORT).show();
 
       // Request to sync data with the backend
-      ContentResolver.requestSync(ExpensesAccountResolver.getInstance().getAccount(), ExpenseDataContract.CONTENT_AUTHORITY, new Bundle());
+      ContentResolver.requestSync(ExpensesAccountResolver.getInstance().getAccount(), ExpensesDataContentProvider.Contract.CONTENT_AUTHORITY, new Bundle());
 
     } catch (Exception e) {
       e.printStackTrace();

@@ -29,7 +29,12 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import org.json.*;
-import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
+
+import com.nicolacimmino.expensestracker.tracker.data_model.ExpensesDataContentProvider;
+import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpensesAPIContract;
+import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpensesApiGetExpensesRequest;
+import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpensesApiNewExpenseRequest;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -62,7 +67,7 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
 
     String authToken = "";
     try {
-      authToken = mAccountManager.blockingGetAuthToken(account, ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
+      authToken = mAccountManager.blockingGetAuthToken(account, ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
     } catch (Exception e) {
       // We couldn't get an auth token, we fail the sync.
       syncResult.stats.numAuthExceptions++;
@@ -70,70 +75,41 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     // Get expenses that are not yet synced with the server.
-    Cursor expenses = getContext().getContentResolver().query(ExpenseDataContract.Expense.CONTENT_URI,
-        ExpenseDataContract.Expense.COLUMN_NAME_ALL,
-        ExpenseDataContract.Expense.COLUMN_NAME_SYNC + "=?", new String[]{"0"}, null);
+    Cursor expenses = getContext().getContentResolver().query(ExpensesDataContentProvider.Contract.Expense.CONTENT_URI,
+        ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_ALL,
+        ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_SYNC + "=?", new String[]{"0"}, null);
 
     while (expenses.moveToNext()) {
       HttpURLConnection connection = null;
       try {
-        JSONObject authenticationData = new JSONObject();
-        authenticationData.put(ExpensesAPIContract.Expense.NOTES,
-            expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION)));
-        authenticationData.put(ExpensesAPIContract.Expense.CURRENCY,
-            expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY)));
-        authenticationData.put(ExpensesAPIContract.Expense.AMOUNT,
-            expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT)));
-        authenticationData.put(ExpensesAPIContract.Expense.DESTINATION,
-            expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION)));
-        authenticationData.put(ExpensesAPIContract.Expense.SOURCE,
-            expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE)));
-        authenticationData.put(ExpensesAPIContract.Expense.TIMESTAMP,
-            expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP)));
-        authenticationData.put(ExpensesAPIContract.Expense.REPORTER_GCM_REG_ID,
+        JSONObject expense = new JSONObject();
+        expense.put(ExpensesAPIContract.Expense.NOTES,
+            expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_DESCRIPTION)));
+        expense.put(ExpensesAPIContract.Expense.CURRENCY,
+            expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_CURRENCY)));
+        expense.put(ExpensesAPIContract.Expense.AMOUNT,
+            expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_AMOUNT)));
+        expense.put(ExpensesAPIContract.Expense.DESTINATION,
+            expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_DESTINATION)));
+        expense.put(ExpensesAPIContract.Expense.SOURCE,
+            expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_SOURCE)));
+        expense.put(ExpensesAPIContract.Expense.TIMESTAMP,
+            expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_TIMESTAMP)));
+        expense.put(ExpensesAPIContract.Expense.REPORTER_GCM_REG_ID,
             GcmRegistration.getRegistration_id());
-        byte[] postDataBytes = authenticationData.toString(0).getBytes("UTF-8");
 
-        Log.i(TAG, "Account name:" + account.name);
-        URL url = new URL(ExpensesAPIContract.URL + "/expenses/" + account.name + "?auth_token=" + authToken);
-        connection = (HttpURLConnection) url.openConnection();
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setInstanceFollowRedirects(false);
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestProperty("charset", "utf-8");
-        connection.setRequestProperty("Content-Length", "" + Integer.toString(postDataBytes.length));
-        connection.setUseCaches(false);
-
-        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-        wr.write(postDataBytes);
-        wr.flush();
-        wr.close();
-
-        int response = connection.getResponseCode();
-        Log.i(TAG, String.valueOf(response));
-        connection.disconnect();
-
-        if (response == 200) {
+        ExpensesApiNewExpenseRequest request = new ExpensesApiNewExpenseRequest(expense, account.name, authToken);
+        if (request.performRequest()) {
           syncResult.stats.numEntries++;
           ContentValues values = new ContentValues();
-          values.put(ExpenseDataContract.Expense.COLUMN_NAME_SYNC, "1");
-          getContext().getContentResolver().update(ExpenseDataContract.Expense.CONTENT_URI,
+          values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_SYNC, "1");
+          getContext().getContentResolver().update(ExpensesDataContentProvider.Contract.Expense.CONTENT_URI,
               values,
-              ExpenseDataContract.Expense.COLUMN_NAME_ID + "=?",
-              new String[]{expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_ID))});
+              ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_ID + "=?",
+              new String[]{expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_ID))});
         } else {
           syncResult.stats.numIoExceptions++;
         }
-      } catch (MalformedURLException e) {
-        Log.e(TAG, "URL is malformed", e);
-        syncResult.stats.numParseExceptions++;
-        return;
-      } catch (IOException e) {
-        Log.e(TAG, "Error reading from network: " + e.toString());
-        syncResult.stats.numIoExceptions++;
-        return;
       } catch (JSONException e) {
         Log.e(TAG, "Error building json doc: " + e.toString());
         syncResult.stats.numIoExceptions++;
@@ -152,64 +128,43 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
   }
 
   public void fetchExpensesFromServer(String authToken) {
-    HttpURLConnection connection = null;
+
     try {
-      URL url = new URL("http://expensesapi.nicolacimmino.com/expenses/nicola?auth_token=" + authToken);
-      connection = (HttpURLConnection) url.openConnection();
-      connection.setDoOutput(false);
-      connection.setDoInput(true);
-      connection.setInstanceFollowRedirects(true);
-      connection.setRequestMethod("GET");
-      connection.setUseCaches(false);
+      ExpensesApiGetExpensesRequest request = new ExpensesApiGetExpensesRequest(
+          ExpensesAccountResolver.getInstance().getAccount().name, authToken);
 
-      BufferedReader is = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-      String inputLine = "";
-      String response = "";
-      while ((inputLine = is.readLine()) != null) {
-        response += inputLine;
+      if(!request.performRequest()) {
+        Log.e(TAG, "ExpensesApiGetExpensesRequest failed");
+        return;
       }
-      is.close();
+      JSONArray jsonObject = request.getExpenses();
 
-      getContext().getContentResolver().delete(ExpenseDataContract.Expense.CONTENT_URI,
-          ExpenseDataContract.Expense.COLUMN_NAME_SYNC + "=1", null);
+      getContext().getContentResolver().delete(ExpensesDataContentProvider.Contract.Expense.CONTENT_URI,
+          ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_SYNC + "=1", null);
 
-      JSONArray jsonObject = new JSONArray(response);
       for (int ix = 0; ix < jsonObject.length(); ix++) {
         Log.i(TAG, "Expense: " + jsonObject.getJSONObject(ix).get("amount"));
 
         ContentValues values = new ContentValues();
-        values.put(ExpenseDataContract.Expense.COLUMN_NAME_SYNC, "1");
-        values.put(ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY, "eur");
-        values.put(ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT, jsonObject.getJSONObject(ix).getString("amount"));
-        values.put(ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION, jsonObject.getJSONObject(ix).getString("notes"));
-        values.put(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE, jsonObject.getJSONObject(ix).getString("source"));
-        values.put(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION, jsonObject.getJSONObject(ix).getString("destination"));
+        values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_SYNC, "1");
+        values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_CURRENCY, "eur");
+        values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_AMOUNT, jsonObject.getJSONObject(ix).getString("amount"));
+        values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_DESCRIPTION, jsonObject.getJSONObject(ix).getString("notes"));
+        values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_SOURCE, jsonObject.getJSONObject(ix).getString("source"));
+        values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_DESTINATION, jsonObject.getJSONObject(ix).getString("destination"));
         if (jsonObject.getJSONObject(ix).has("timestamp")) {
-          values.put(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP, jsonObject.getJSONObject(ix).getString("timestamp"));
+          values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_TIMESTAMP, jsonObject.getJSONObject(ix).getString("timestamp"));
         } else {
-          values.put(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP, "19750620 16:00:00");
+          values.put(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_TIMESTAMP, "19750620 16:00:00");
         }
 
-        getContext().getContentResolver().insert(ExpenseDataContract.Expense.CONTENT_URI,
+        getContext().getContentResolver().insert(ExpensesDataContentProvider.Contract.Expense.CONTENT_URI,
             values);
       }
-
-      Log.i(TAG, String.valueOf(response));
-      Log.i(TAG, "Server expenses:" + response);
-      connection.disconnect();
-    } catch (MalformedURLException e) {
-      Log.e(TAG, "URL is malformed", e);
-      return;
-    } catch (IOException e) {
-      Log.e(TAG, "Error reading from network: " + e.toString());
-      return;
     } catch (JSONException e) {
       Log.e(TAG, "Invalid JSON: " + e.toString());
       return;
     } finally {
-      if (connection != null) {
-        connection.disconnect();
-      }
     }
 
   }

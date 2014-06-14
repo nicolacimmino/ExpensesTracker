@@ -35,11 +35,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.nicolacimmino.expensestracker.tracker.R;
-import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
-import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticator;
-import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticatorContract;
+import com.nicolacimmino.expensestracker.tracker.data_model.ExpensesDataContentProvider;
+import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseAPIAuthenticator;
 
-public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity {
+public class LoginActivity extends AccountAuthenticatorActivity {
 
   // Instance of the user login task.
   private UserLoginTask mAuthTask = null;
@@ -163,20 +162,20 @@ public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-      String authToken = ExpenseDataAuthenticator.SignInUser(mUsername, mPassword, "");
+      String authToken = ExpenseAPIAuthenticator.signInUser(mUsername, mPassword, "");
       if (authToken == null || authToken.isEmpty()) {
         return false;
       }
 
-      Account newAccount = new Account(mUsername, ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
-      AccountManager accountManager = (AccountManager) getApplicationContext().getSystemService(ACCOUNT_SERVICE);
+      Account newAccount = new Account(mUsername, ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.ACCOUNT_TYPE);
+      AccountManager accountManager = AccountManager.get(getApplicationContext());
 
       if (accountManager.addAccountExplicitly(newAccount, mPassword, null)) {
-        accountManager.setAuthToken(newAccount, ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, authToken);
+        accountManager.setAuthToken(newAccount, ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, authToken);
 
         // Turn on automatic syncing for the new account.
-        ContentResolver.setIsSyncable(newAccount, ExpenseDataContract.CONTENT_AUTHORITY, 1);
-        ContentResolver.setSyncAutomatically(newAccount, ExpenseDataContract.CONTENT_AUTHORITY, true);
+        ContentResolver.setIsSyncable(newAccount, ExpensesDataContentProvider.Contract.CONTENT_AUTHORITY, 1);
+        ContentResolver.setSyncAutomatically(newAccount, ExpensesDataContentProvider.Contract.CONTENT_AUTHORITY, true);
 
         return true;
       } else {

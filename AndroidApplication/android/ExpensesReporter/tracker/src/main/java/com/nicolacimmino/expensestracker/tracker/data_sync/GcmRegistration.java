@@ -148,7 +148,7 @@ public class GcmRegistration {
         try
 
         {
-          authToken = AccountManager.get(mContext).blockingGetAuthToken(account, ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
+          authToken = AccountManager.get(mContext).blockingGetAuthToken(account, ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
         } catch (
             Exception e
             )

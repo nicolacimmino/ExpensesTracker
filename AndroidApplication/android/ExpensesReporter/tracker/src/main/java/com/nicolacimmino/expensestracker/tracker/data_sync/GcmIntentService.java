@@ -32,7 +32,7 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nicolacimmino.expensestracker.tracker.R;
-import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
+import com.nicolacimmino.expensestracker.tracker.data_model.ExpensesDataContentProvider;
 import com.nicolacimmino.expensestracker.tracker.ui.ExpensesListActivity;
 
 /*
@@ -71,7 +71,7 @@ public class GcmIntentService extends IntentService {
 
         // We know something changed on the server, so we request a sync of the ExpensesDataPRovider
         getContentResolver().requestSync(ExpensesAccountResolver.getInstance().getAccount(),
-            ExpenseDataContract.CONTENT_AUTHORITY, extras);
+            ExpensesDataContentProvider.Contract.CONTENT_AUTHORITY, extras);
 
         // Post notification of received message.
         showExpensesUpdatedNotification();

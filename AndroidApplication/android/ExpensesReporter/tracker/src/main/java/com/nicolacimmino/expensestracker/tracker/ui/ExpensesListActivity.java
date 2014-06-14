@@ -15,35 +15,33 @@
  *    along with this program.  If not, see http://www.gnu.org/licenses/.
  *
 */
-
 package com.nicolacimmino.expensestracker.tracker.ui;
 
 import android.app.ListActivity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.ListView;
 
-import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensestracker.tracker.R;
+import com.nicolacimmino.expensestracker.tracker.data_model.ExpensesDataContentProvider;
 
+/*
+ * The ativity showing a list of all expenses.
+ */
 public class ExpensesListActivity extends ListActivity {
-
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    Cursor cursor = getContentResolver().query(ExpenseDataContract.Expense.CONTENT_URI,
-        ExpenseDataContract.Expense.COLUMN_NAME_ALL, null, null, ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP + " DESC");
+    // Query the Expense Data Content provider and get all expenses sorted by timestamp.
+    Cursor cursor = getContentResolver().query(ExpensesDataContentProvider.Contract.Expense.CONTENT_URI,
+        ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_ALL, null, null,
+        ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_TIMESTAMP + " DESC");
 
-    ExpensesTransactionCursorAdapter adapter = new ExpensesTransactionCursorAdapter(this, R.layout.expeses_transactions_row, cursor, 0);
-
+    // Let the Expenses Cursor Adapter render the cursor content into list items.
+    ExpensesCursorAdapter adapter = new ExpensesCursorAdapter(this, R.layout.expeses_transactions_row, cursor, 0);
     setListAdapter(adapter);
+
   }
 
-  @Override
-  public void onListItemClick(ListView l, View v, int position, long id) {
-    // Do something when a list item is clicked
-  }
 }

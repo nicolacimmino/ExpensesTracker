@@ -59,7 +59,7 @@ public class ExpensesAccountResolver {
 
     // At the moment we resolve the current account just by taking the first account of the
     // expenses accounts type.
-    Account[] accounts = AccountManager.get(mContext).getAccountsByType(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
+    Account[] accounts = AccountManager.get(mContext).getAccountsByType(ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.ACCOUNT_TYPE);
 
     if (accounts.length > 0) {
       return accounts[0];

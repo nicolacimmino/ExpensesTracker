@@ -25,17 +25,17 @@ import android.view.View;
 import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 
-import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensestracker.tracker.R;
+import com.nicolacimmino.expensestracker.tracker.data_model.ExpensesDataContentProvider;
 
-public class ExpensesTransactionCursorAdapter extends ResourceCursorAdapter {
+public class ExpensesCursorAdapter extends ResourceCursorAdapter {
 
   Context context;
   int layoutResourceId;
   Cursor cursor = null;
 
 
-  public ExpensesTransactionCursorAdapter(Context context, int layout, Cursor cursor, int flags) {
+  public ExpensesCursorAdapter(Context context, int layout, Cursor cursor, int flags) {
     super(context, layout, cursor, flags);
     this.layoutResourceId = layout;
     this.context = context;
@@ -50,12 +50,12 @@ public class ExpensesTransactionCursorAdapter extends ResourceCursorAdapter {
     TextView txtTimestamp = (TextView) view.findViewById(R.id.expense_row_timestamp);
     TextView txtSync = (TextView) view.findViewById(R.id.expense_row_sync);
 
-    txtDescription.setText(cursor.getString(cursor.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION)));
-    txtAmount.setText(cursor.getString(cursor.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT)));
-    txtAccounnts.setText(cursor.getString(cursor.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE)) + " > "
-        + cursor.getString(cursor.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION)));
-    txtTimestamp.setText(cursor.getString(cursor.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP)));
-    if (cursor.getInt(cursor.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_SYNC)) == 1) {
+    txtDescription.setText(cursor.getString(cursor.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_DESCRIPTION)));
+    txtAmount.setText(cursor.getString(cursor.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_AMOUNT)));
+    txtAccounnts.setText(cursor.getString(cursor.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_SOURCE)) + " > "
+        + cursor.getString(cursor.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_DESTINATION)));
+    txtTimestamp.setText(cursor.getString(cursor.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_TIMESTAMP)));
+    if (cursor.getInt(cursor.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_SYNC)) == 1) {
       txtSync.setText("S");
     }
   }
