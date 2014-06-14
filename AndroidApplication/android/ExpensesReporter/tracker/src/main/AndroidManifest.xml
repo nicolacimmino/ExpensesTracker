@@ -9,7 +9,7 @@
         android:theme="@style/AppTheme"
         android:name="ExpensesTrackerApplication">
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.TransactionsInputActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -50,7 +50,7 @@
         <activity
             android:name=".ui.ExpensesListActivity"
             android:label="@string/title_activity_expenses_list"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName=".ui.TransactionsInputActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />

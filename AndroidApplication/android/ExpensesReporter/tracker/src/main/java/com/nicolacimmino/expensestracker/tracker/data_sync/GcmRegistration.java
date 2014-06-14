@@ -10,7 +10,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.nicolacimmino.expensestracker.tracker.ui.SharedPreferencesContract;
+import com.nicolacimmino.expensestracker.tracker.SharedPreferencesContract;
 
 import org.json.JSONException;
 import org.json.JSONObject;

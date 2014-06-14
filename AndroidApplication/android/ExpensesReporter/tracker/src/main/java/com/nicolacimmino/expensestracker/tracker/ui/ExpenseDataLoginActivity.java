@@ -1,5 +1,4 @@
 /* ExpenseDataLoginActivity is part of ExpensesTracker and provides the login interface.
- * Based on the template included in AndroidStudio.
  *   Copyright (C) 2014 Nicola Cimmino
  *
  *    This program is free software: you can redistribute it and/or modify
@@ -25,79 +24,43 @@ import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import com.nicolacimmino.expensestracker.tracker.R;
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticator;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticatorContract;
 
+public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity {
 
-public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity implements LoaderCallbacks<Cursor> {
-
-  // Arguments of the intent starting this activity.
-  public static final String ARG_ACCOUNT_TYPE = "account_type";
-  public static final String ARG_AUTH_TYPE = "auth_type";
-  public static final String ARG_IS_ADDING_NEW_ACCOUNT = "is_adding_new";
-
-  /**
-   * Keep track of the login task to ensure we can cancel it if requested.
-   */
+  // Instance of the user login task.
   private UserLoginTask mAuthTask = null;
 
   // UI references.
-  private AutoCompleteTextView mEmailView;
+  private EditText mUsernameView;
   private EditText mPasswordView;
   private View mProgressView;
   private View mLoginFormView;
-
+  private Button mSignInButton;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_expese_data_login);
 
-
     // Set up the login form.
-    mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-    populateAutoComplete();
-
+    mUsernameView = (EditText) findViewById(R.id.username);
     mPasswordView = (EditText) findViewById(R.id.password);
-    mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-      @Override
-      public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-        if (id == R.id.login || id == EditorInfo.IME_NULL) {
-          attemptLogin();
-          return true;
-        }
-        return false;
-      }
-    });
-
-    Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-    mEmailSignInButton.setOnClickListener(new OnClickListener() {
+    mSignInButton = (Button) findViewById(R.id.sign_in_button);
+    mSignInButton.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View view) {
         attemptLogin();
@@ -108,72 +71,49 @@ public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity imple
     mProgressView = findViewById(R.id.login_progress);
   }
 
-  private void populateAutoComplete() {
-    getLoaderManager().initLoader(0, null, this);
-  }
 
 
-  /**
-   * Attempts to sign in or register the account specified by the login form.
-   * If there are form errors (invalid email, missing fields, etc.), the
-   * errors are presented and no actual login attempt is made.
+  /*
+   * Attempts the login.
    */
   public void attemptLogin() {
+
+    // A previous login attempt is ongoing do nothing.
     if (mAuthTask != null) {
       return;
     }
 
     // Reset errors.
-    mEmailView.setError(null);
+    mUsernameView.setError(null);
     mPasswordView.setError(null);
 
     // Store values at the time of the login attempt.
-    String email = mEmailView.getText().toString();
+    String email = mUsernameView.getText().toString();
     String password = mPasswordView.getText().toString();
 
     boolean cancel = false;
     View focusView = null;
 
-
-    // Check for a valid password, if the user entered one.
-    if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-      mPasswordView.setError(getString(R.string.error_invalid_password));
-      focusView = mPasswordView;
-      cancel = true;
-    }
-
-    // Check for a valid email address.
+    // Username is compulsory.
     if (TextUtils.isEmpty(email)) {
-      mEmailView.setError(getString(R.string.error_field_required));
-      focusView = mEmailView;
+      mUsernameView.setError(getString(R.string.error_field_required));
+      focusView = mUsernameView;
       cancel = true;
     }
 
     if (cancel) {
-      // There was an error; don't attempt login and focus the first
-      // form field with an error.
+      // There was an error; don't attempt login and focus the first form field with an error.
       focusView.requestFocus();
     } else {
-      // Show a progress spinner, and kick off a background task to
-      // perform the user login attempt.
+      // Show a progress spinner, and start authentication in a background task.
       showProgress(true);
       mAuthTask = new UserLoginTask(email, password);
       mAuthTask.execute((Void) null);
     }
   }
 
-  private boolean isEmailValid(String email) {
-    //TODO: Replace this with your own logic
-    return email.contains("@");
-  }
-
-  private boolean isPasswordValid(String password) {
-    //TODO: Replace this with your own logic
-    return password.length() > 2;
-  }
-
-  /**
-   * Shows the progress UI and hides the login form.
+  /*
+   * Show the progress UI and hide the login form.
    */
   @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
   public void showProgress(final boolean show) {
@@ -208,84 +148,27 @@ public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity imple
     }
   }
 
-
-  @Override
-  public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-    return new CursorLoader(this,
-        // Retrieve data rows for the device user's 'profile' contact.
-        Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-            ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-        // Select only email addresses.
-        ContactsContract.Contacts.Data.MIMETYPE +
-            " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-        .CONTENT_ITEM_TYPE},
-
-        // Show primary email addresses first. Note that there won't be
-        // a primary email address if the user hasn't specified one.
-        ContactsContract.Contacts.Data.IS_PRIMARY + " DESC"
-    );
-  }
-
-  @Override
-  public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-    List<String> emails = new ArrayList<String>();
-    cursor.moveToFirst();
-    while (!cursor.isAfterLast()) {
-      emails.add(cursor.getString(ProfileQuery.ADDRESS));
-      cursor.moveToNext();
-    }
-
-    addEmailsToAutoComplete(emails);
-  }
-
-  @Override
-  public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-  }
-
-  private interface ProfileQuery {
-    String[] PROJECTION = {
-        ContactsContract.CommonDataKinds.Email.ADDRESS,
-        ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-    };
-
-    int ADDRESS = 0;
-    int IS_PRIMARY = 1;
-  }
-
-
-  private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-    //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-    ArrayAdapter<String> adapter =
-        new ArrayAdapter<String>(ExpenseDataLoginActivity.this,
-            android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-    mEmailView.setAdapter(adapter);
-  }
-
-  /**
-   * Represents an asynchronous login/registration task used to authenticate
-   * the user.
+  /*
+   * Represents an asynchronous login/registration task used to authenticate the user.
    */
   public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-    private final String mEmail;
+    private final String mUsername;
     private final String mPassword;
 
-    UserLoginTask(String email, String password) {
-      mEmail = email;
+    UserLoginTask(String username, String password) {
+      mUsername = username;
       mPassword = password;
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
-      String authToken = ExpenseDataAuthenticator.SignInUser(mEmail, mPassword, "");
+      String authToken = ExpenseDataAuthenticator.SignInUser(mUsername, mPassword, "");
       if (authToken == null || authToken.isEmpty()) {
         return false;
       }
 
-      Account newAccount = new Account(mEmail, ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
+      Account newAccount = new Account(mUsername, ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
       AccountManager accountManager = (AccountManager) getApplicationContext().getSystemService(ACCOUNT_SERVICE);
 
       if (accountManager.addAccountExplicitly(newAccount, mPassword, null)) {

@@ -1,4 +1,4 @@
-package com.nicolacimmino.expensestracker.tracker.ui;
+package com.nicolacimmino.expensestracker.tracker;
 
 /**
  * Created by nicola on 13/06/2014.

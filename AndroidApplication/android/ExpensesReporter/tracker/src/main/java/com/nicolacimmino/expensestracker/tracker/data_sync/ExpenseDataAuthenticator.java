@@ -72,9 +72,6 @@ public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
     //  to be created. We don't start the activity here
     //  but return a bundle for the AccountManager to actually start it.
     final Intent intent = new Intent(mContext, ExpenseDataLoginActivity.class);
-    intent.putExtra(ExpenseDataLoginActivity.ARG_ACCOUNT_TYPE, accountType);
-    intent.putExtra(ExpenseDataLoginActivity.ARG_AUTH_TYPE, authTokenType);
-    intent.putExtra(ExpenseDataLoginActivity.ARG_IS_ADDING_NEW_ACCOUNT, true);
     intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
     final Bundle returnBundle = new Bundle();
     returnBundle.putParcelable(AccountManager.KEY_INTENT, intent);
@@ -125,9 +122,6 @@ public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
     // need to re-prompt them for their credentials. We do that by creating
     // an intent to display our AuthenticatorActivity.
     final Intent intent = new Intent(mContext, ExpenseDataLoginActivity.class);
-    intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-    intent.putExtra(ExpenseDataLoginActivity.ARG_ACCOUNT_TYPE, account.type);
-    intent.putExtra(ExpenseDataLoginActivity.ARG_AUTH_TYPE, authTokenType);
     final Bundle responseBundle = new Bundle();
     responseBundle.putParcelable(AccountManager.KEY_INTENT, intent);
     return responseBundle;

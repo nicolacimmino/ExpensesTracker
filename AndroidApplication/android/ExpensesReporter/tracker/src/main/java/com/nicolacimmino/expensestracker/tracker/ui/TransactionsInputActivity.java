@@ -22,7 +22,6 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -33,13 +32,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.nicolacimmino.expensestracker.tracker.R;
+import com.nicolacimmino.expensestracker.tracker.SharedPreferencesContract;
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseDataAuthenticatorContract;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpensesAccountResolver;
-import com.nicolacimmino.expensestracker.tracker.data_sync.GcmRegistration;
 
 
-public class MainActivity extends Activity {
+public class TransactionsInputActivity extends Activity {
 
   // Tag used in logs.
   private static final String TAG = "MainActivity";

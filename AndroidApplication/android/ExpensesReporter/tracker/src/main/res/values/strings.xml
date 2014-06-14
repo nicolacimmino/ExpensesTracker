@@ -4,7 +4,6 @@
     <string name="app_name">Expenses Tracker</string>
     <string name="title_view_detail">view Detail</string>
     <string name="title_activity_main">Expenses Tracker</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="default_currency">eur</string>
     <string name="title_activity_expenses_list">Expenses</string>
@@ -43,5 +42,19 @@
     <string name="saved">Saved</string>
     <string name="error_saving">Error saving data.</string>
     <string name="notification_data_changed">Expenses data changed.</string>
+
+    <string name="title_activity_expese_data_login">Sign in</string>
+
+    <!-- Strings related to login activity-->
+    <string name="prompt_email">Username</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="plus_sign_out">Switch account</string>
+    <string name="plus_disconnect">Disconnect</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">Wrong email or password</string>
+    <string name="error_field_required">This field is required</string>
 
 </resources>

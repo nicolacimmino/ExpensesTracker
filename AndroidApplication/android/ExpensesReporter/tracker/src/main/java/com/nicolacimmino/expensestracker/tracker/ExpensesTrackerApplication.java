@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpensesAccountResolver;
 import com.nicolacimmino.expensestracker.tracker.data_sync.GcmRegistration;
-import com.nicolacimmino.expensestracker.tracker.ui.MainActivity;
+import com.nicolacimmino.expensestracker.tracker.ui.TransactionsInputActivity;
 
 /**
  * Subclass of Application.
@@ -22,7 +22,7 @@ public class ExpensesTrackerApplication extends Application {
 
     // Make sure we are registered with Google Cloud Messaging so we can receive notifications.
     GcmRegistration gcmRegistration = new GcmRegistration(getApplicationContext(),
-        getSharedPreferences(MainActivity.class.getSimpleName(), Context.MODE_PRIVATE));
+        getSharedPreferences(TransactionsInputActivity.class.getSimpleName(), Context.MODE_PRIVATE));
 
     gcmRegistration.Register();
 
