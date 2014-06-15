@@ -36,7 +36,7 @@ import android.widget.EditText;
 
 import com.nicolacimmino.expensestracker.tracker.R;
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpensesDataContentProvider;
-import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseAPIAuthenticator;
+import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpenseApiAuthenticator;
 
 public class LoginActivity extends AccountAuthenticatorActivity {
 
@@ -162,16 +162,16 @@ public class LoginActivity extends AccountAuthenticatorActivity {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-      String authToken = ExpenseAPIAuthenticator.signInUser(mUsername, mPassword, "");
+      String authToken = ExpenseApiAuthenticator.signInUser(mUsername, mPassword, "");
       if (authToken == null || authToken.isEmpty()) {
         return false;
       }
 
-      Account newAccount = new Account(mUsername, ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.ACCOUNT_TYPE);
+      Account newAccount = new Account(mUsername, ExpenseApiAuthenticator.ExpenseAPIAuthenticatorContract.ACCOUNT_TYPE);
       AccountManager accountManager = AccountManager.get(getApplicationContext());
 
       if (accountManager.addAccountExplicitly(newAccount, mPassword, null)) {
-        accountManager.setAuthToken(newAccount, ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, authToken);
+        accountManager.setAuthToken(newAccount, ExpenseApiAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, authToken);
 
         // Turn on automatic syncing for the new account.
         ContentResolver.setIsSyncable(newAccount, ExpensesDataContentProvider.Contract.CONTENT_AUTHORITY, 1);

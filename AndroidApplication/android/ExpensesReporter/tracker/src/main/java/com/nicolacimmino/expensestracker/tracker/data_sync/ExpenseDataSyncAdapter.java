@@ -31,17 +31,12 @@ import android.util.Log;
 import org.json.*;
 
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpensesDataContentProvider;
-import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpensesAPIContract;
+import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpenseApiAuthenticator;
+import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpensesApiContract;
 import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpensesApiGetExpensesRequest;
 import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpensesApiNewExpenseRequest;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /*
  * Sync adapter for Expense data.
@@ -65,15 +60,6 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
   public void onPerformSync(Account account,Bundle extras,
       String authority,ContentProviderClient provider, SyncResult syncResult) {
 
-    String authToken = "";
-    try {
-      authToken = mAccountManager.blockingGetAuthToken(account, ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
-    } catch (Exception e) {
-      // We couldn't get an auth token, we fail the sync.
-      syncResult.stats.numAuthExceptions++;
-      return;
-    }
-
     // Get expenses that are not yet synced with the server.
     Cursor expenses = getContext().getContentResolver().query(ExpensesDataContentProvider.Contract.Expense.CONTENT_URI,
         ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_ALL,
@@ -83,22 +69,22 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
       HttpURLConnection connection = null;
       try {
         JSONObject expense = new JSONObject();
-        expense.put(ExpensesAPIContract.Expense.NOTES,
+        expense.put(ExpensesApiContract.Expense.NOTES,
             expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_DESCRIPTION)));
-        expense.put(ExpensesAPIContract.Expense.CURRENCY,
+        expense.put(ExpensesApiContract.Expense.CURRENCY,
             expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_CURRENCY)));
-        expense.put(ExpensesAPIContract.Expense.AMOUNT,
+        expense.put(ExpensesApiContract.Expense.AMOUNT,
             expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_AMOUNT)));
-        expense.put(ExpensesAPIContract.Expense.DESTINATION,
+        expense.put(ExpensesApiContract.Expense.DESTINATION,
             expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_DESTINATION)));
-        expense.put(ExpensesAPIContract.Expense.SOURCE,
+        expense.put(ExpensesApiContract.Expense.SOURCE,
             expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_SOURCE)));
-        expense.put(ExpensesAPIContract.Expense.TIMESTAMP,
+        expense.put(ExpensesApiContract.Expense.TIMESTAMP,
             expenses.getString(expenses.getColumnIndex(ExpensesDataContentProvider.Contract.Expense.COLUMN_NAME_TIMESTAMP)));
-        expense.put(ExpensesAPIContract.Expense.REPORTER_GCM_REG_ID,
+        expense.put(ExpensesApiContract.Expense.REPORTER_GCM_REG_ID,
             GcmRegistration.getRegistration_id());
 
-        ExpensesApiNewExpenseRequest request = new ExpensesApiNewExpenseRequest(expense, account.name, authToken);
+        ExpensesApiNewExpenseRequest request = new ExpensesApiNewExpenseRequest(expense);
         if (request.performRequest()) {
           syncResult.stats.numEntries++;
           ContentValues values = new ContentValues();
@@ -122,16 +108,15 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
     }
     expenses.close();
 
-    fetchExpensesFromServer(authToken);
+    fetchExpensesFromServer();
 
     Log.i(TAG, "Sync done");
   }
 
-  public void fetchExpensesFromServer(String authToken) {
+  public void fetchExpensesFromServer() {
 
     try {
-      ExpensesApiGetExpensesRequest request = new ExpensesApiGetExpensesRequest(
-          ExpensesAccountResolver.getInstance().getAccount().name, authToken);
+      ExpensesApiGetExpensesRequest request = new ExpensesApiGetExpensesRequest();
 
       if(!request.performRequest()) {
         Log.e(TAG, "ExpensesApiGetExpensesRequest failed");

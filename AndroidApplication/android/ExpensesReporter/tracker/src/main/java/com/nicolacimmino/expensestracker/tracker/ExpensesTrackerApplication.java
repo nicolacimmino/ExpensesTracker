@@ -27,9 +27,8 @@ public class ExpensesTrackerApplication extends Application {
     gcmRegistration.Register();
 
     if (ExpensesAccountResolver.getInstance().getAccount() != null) {
-      // Associate our Google Cloud Messaging registration id with this account so that the
-      //  backend can send relevant notifications to us.
-      gcmRegistration.SendRegistrationIdToBackend(ExpensesAccountResolver.getInstance().getAccount());
+      // Register our GCM registration ID with the epxpenses API so we can get notifications..
+      gcmRegistration.SendRegistrationIdToBackend();
     }
   }
 }

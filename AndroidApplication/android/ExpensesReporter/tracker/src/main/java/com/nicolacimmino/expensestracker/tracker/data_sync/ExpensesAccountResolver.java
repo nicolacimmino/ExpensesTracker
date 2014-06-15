@@ -1,5 +1,5 @@
 /* ExpensesAccountResolver is part of ExpensesTracker and is responsible to provide resolution of
- *  the expenses account currently in use.
+ *  the expenses account currently in use and related authentication token and GCM registration id.
  *
  *   Copyright (C) 2014 Nicola Cimmino
  *
@@ -21,7 +21,16 @@ package com.nicolacimmino.expensestracker.tracker.data_sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
+import android.app.Application;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.util.Log;
+
+import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpenseApiAuthenticator;
+
+import java.io.IOException;
 
 /*
  * Takes care to provide globally to the application the current account in use.
@@ -29,13 +38,16 @@ import android.content.Context;
  * the first one would be used. This is here so in the future we can support multiple
  * accounts without changing the code all over the place. This is a singleton.
  */
-public class ExpensesAccountResolver {
+public class ExpensesAccountResolver extends Application {
 
   // The only instance.
   private static ExpensesAccountResolver mInstance;
 
   // The application context.
   private static Context mContext;
+
+  // Tag used in logging.
+  private static final String TAG = "ExpensesAccountResolver";
 
   // Private constructor so nobody can instantiate us.
   private ExpensesAccountResolver() {
@@ -59,7 +71,7 @@ public class ExpensesAccountResolver {
 
     // At the moment we resolve the current account just by taking the first account of the
     // expenses accounts type.
-    Account[] accounts = AccountManager.get(mContext).getAccountsByType(ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.ACCOUNT_TYPE);
+    Account[] accounts = AccountManager.get(mContext).getAccountsByType(ExpenseApiAuthenticator.ExpenseAPIAuthenticatorContract.ACCOUNT_TYPE);
 
     if (accounts.length > 0) {
       return accounts[0];
@@ -68,4 +80,24 @@ public class ExpensesAccountResolver {
     }
   }
 
+  // Gets the username for the currently used account.
+  public String getUsername() {
+    return getAccount().name;
+  }
+
+  // Gets the authorization token related to the curretly used account.
+  public String getAuthorizationToken() {
+    String authToken = "";
+    try {
+      authToken = AccountManager.get(mContext).blockingGetAuthToken(getAccount(),
+          ExpenseApiAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
+    } catch (OperationCanceledException e) {
+    } catch (IOException e) {
+    } catch (AuthenticatorException e) {
+      Log.i(TAG, "Exception on get auth token");
+      return null;
+    }
+
+    return authToken;
+  }
 }

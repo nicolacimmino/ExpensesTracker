@@ -34,7 +34,7 @@ import android.widget.Toast;
 import com.nicolacimmino.expensestracker.tracker.R;
 import com.nicolacimmino.expensestracker.tracker.SharedPreferencesContract;
 import com.nicolacimmino.expensestracker.tracker.data_model.ExpensesDataContentProvider;
-import com.nicolacimmino.expensestracker.tracker.data_sync.ExpenseAPIAuthenticator;
+import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpenseApiAuthenticator;
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpensesAccountResolver;
 
 
@@ -82,8 +82,8 @@ public class TransactionsInputActivity extends Activity {
     // If we don't have an account yet ask first account manager to have the user to create one.
     // This will show immediatley the ExpensesDataLoginActivity before the user can proceed.
     if (ExpensesAccountResolver.getInstance().getAccount() == null) {
-      AccountManager.get(this).addAccount(ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.ACCOUNT_TYPE,
-          ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS,
+      AccountManager.get(this).addAccount(ExpenseApiAuthenticator.ExpenseAPIAuthenticatorContract.ACCOUNT_TYPE,
+          ExpenseApiAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS,
           null, null, this, null, null);
     }
   }

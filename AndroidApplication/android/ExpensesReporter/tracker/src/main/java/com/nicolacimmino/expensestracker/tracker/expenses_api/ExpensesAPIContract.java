@@ -22,7 +22,7 @@ package com.nicolacimmino.expensestracker.tracker.expenses_api;
 /*
  * Contract for the Expenses API.
  */
-public class ExpensesAPIContract {
+public class ExpensesApiContract {
 
   // The base URL of the API
   // NOTE: this is purely for testing, DO NOT deploy a live system on HTTP,

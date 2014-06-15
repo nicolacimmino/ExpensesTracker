@@ -15,7 +15,7 @@
  *    along with this program.  If not, see http://www.gnu.org/licenses/.
  *
  */
-package com.nicolacimmino.expensestracker.tracker.data_sync;
+package com.nicolacimmino.expensestracker.tracker.expenses_api;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
@@ -28,22 +28,19 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpensesApiGenerateAuthTokenRequest;
 import com.nicolacimmino.expensestracker.tracker.ui.LoginActivity;
-
-import org.json.JSONException;
 
 /*
  * This class subclasses AbstractAccountAuthenticator and provides concrete implementation
  * of authentication against the Expenses API.
  */
-public class ExpenseAPIAuthenticator extends AbstractAccountAuthenticator {
+public class ExpenseApiAuthenticator extends AbstractAccountAuthenticator {
 
   private static final String TAG = "ExpenseDataAuthenticator";
 
   private Context mContext;
 
-  public ExpenseAPIAuthenticator(Context context) {
+  public ExpenseApiAuthenticator(Context context) {
     super(context);
     mContext = context;
   }
@@ -86,7 +83,7 @@ public class ExpenseAPIAuthenticator extends AbstractAccountAuthenticator {
     if (TextUtils.isEmpty(authToken)) {
       final String password = accountManager.getPassword(account);
       if (password != null) {
-        authToken = ExpenseAPIAuthenticator.signInUser(account.name, password, authTokenType);
+        authToken = ExpenseApiAuthenticator.signInUser(account.name, password, authTokenType);
       }
     }
 

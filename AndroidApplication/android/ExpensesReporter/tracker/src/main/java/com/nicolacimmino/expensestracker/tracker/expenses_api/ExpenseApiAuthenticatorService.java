@@ -16,21 +16,21 @@
  *
  */
 
-package com.nicolacimmino.expensestracker.tracker.data_sync;
+package com.nicolacimmino.expensestracker.tracker.expenses_api;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
 
-public class ExpenseAPIAuthenticatorService extends Service {
+public class ExpenseApiAuthenticatorService extends Service {
   // Instance field that stores the authenticator object
-  private ExpenseAPIAuthenticator mAuthenticator;
+  private ExpenseApiAuthenticator mAuthenticator;
 
   @Override
   public void onCreate() {
     // Create a new authenticator object
-    mAuthenticator = new ExpenseAPIAuthenticator(this);
+    mAuthenticator = new ExpenseApiAuthenticator(this);
   }
 
   /*

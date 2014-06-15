@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".data_sync.ExpenseAPIAuthenticatorService" >
+        <service android:name=".expenses_api.ExpenseApiAuthenticatorService" >
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>

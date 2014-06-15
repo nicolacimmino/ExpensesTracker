@@ -11,15 +11,10 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.nicolacimmino.expensestracker.tracker.SharedPreferencesContract;
+import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpenseApiAuthenticator;
+import com.nicolacimmino.expensestracker.tracker.expenses_api.ExpensesApiRegisterMobileRequest;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -134,98 +129,18 @@ public class GcmRegistration {
 
   }
 
-  public void SendRegistrationIdToBackend(Account account) {
+  public void SendRegistrationIdToBackend() {
 
     new AsyncTask() {
 
       @Override
       protected Object doInBackground(Object[] objects) {
 
-        Account account = (Account) objects[0];
-
-        // We need to be registered with the expenses API before we can report the registration key.
-        String authToken = "";
-        try
-
-        {
-          authToken = AccountManager.get(mContext).blockingGetAuthToken(account, ExpenseAPIAuthenticator.ExpenseAPIAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
-        } catch (
-            Exception e
-            )
-
-        {
-          Log.i(TAG, "Exception on get auth token");
-          return null;
-        }
-
-        HttpURLConnection connection = null;
-        try
-
-        {
-          Log.i(TAG, "Sendig gcm registration id to the expenses API");
-
-          JSONObject reportData = new JSONObject();
-          reportData.put("gcmRegistrationId", registration_id);
-
-          byte[] postDataBytes = reportData.toString(0).getBytes("UTF-8");
-
-          URL url = new URL("http://expensesapi.nicolacimmino.com/mobiles/" + account.name + "?auth_token=" + authToken);
-          connection = (HttpURLConnection) url.openConnection();
-          connection.setDoOutput(true);
-          connection.setDoInput(true);
-          connection.setInstanceFollowRedirects(false);
-          connection.setRequestMethod("POST");
-          connection.setRequestProperty("Content-Type", "application/json");
-          connection.setRequestProperty("charset", "utf-8");
-          connection.setRequestProperty("Content-Length", "" + Integer.toString(postDataBytes.length));
-          connection.setUseCaches(false);
-
-          DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-          wr.write(postDataBytes);
-          wr.flush();
-          wr.close();
-
-          int response = connection.getResponseCode();
-          Log.i(TAG, String.valueOf(response));
-          connection.disconnect();
-
-          if (response == 200) {
-            Log.i(TAG, "Registration Id registered with Expenses API");
-          } else {
-            Log.i(TAG, "Registration Id failed to register with Expenses API");
-          }
-        } catch (
-            MalformedURLException e
-            )
-
-        {
-          Log.e(TAG, "URL is malformed", e);
-          return null;
-        } catch (
-            IOException e
-            )
-
-        {
-          Log.e(TAG, "Error reading from network: " + e.toString());
-          return null;
-        } catch (
-            JSONException e
-            )
-
-        {
-          Log.e(TAG, "Error building json doc: " + e.toString());
-          return null;
-        } finally
-
-        {
-          if (connection != null) {
-            connection.disconnect();
-          }
-        }
+        new ExpensesApiRegisterMobileRequest(registration_id).performRequest();
 
         return null;
       }
-    }.execute(account);
+    }.execute();
   }
 
 }

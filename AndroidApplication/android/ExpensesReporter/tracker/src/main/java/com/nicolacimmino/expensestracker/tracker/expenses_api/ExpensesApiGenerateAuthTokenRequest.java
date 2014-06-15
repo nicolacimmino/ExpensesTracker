@@ -20,6 +20,9 @@
 package com.nicolacimmino.expensestracker.tracker.expenses_api;
 
 import android.util.Log;
+
+import com.nicolacimmino.expensestracker.tracker.data_sync.ExpensesAccountResolver;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,7 +37,7 @@ public class ExpensesApiGenerateAuthTokenRequest extends ExpensesApiRequest {
     // POST /users/:username/auth_token
     try {
       setRequestMethod("POST");
-      setUrl(ExpensesAPIContract.URL + "/users/" + username + "/auth_token");
+      setUrl(ExpensesApiContract.URL + "/users/" + username + "/auth_token");
       setRequestData(new JSONObject("{password:" + password + "}"));
     } catch (JSONException e) {
       throw new IllegalArgumentException();

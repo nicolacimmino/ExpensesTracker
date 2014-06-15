@@ -1,4 +1,4 @@
-/* ExpensesApiNewExpenseRequest is part of ExpensesTracker and represents a specialized request
+/* ExpensesApiRegisterMobileRequest is part of ExpensesTracker and represents a specialized request
  *   to the Expenses API.
  *
  *   Copyright (C) 2014 Nicola Cimmino
@@ -21,21 +21,29 @@ package com.nicolacimmino.expensestracker.tracker.expenses_api;
 
 import com.nicolacimmino.expensestracker.tracker.data_sync.ExpensesAccountResolver;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /*
- * Specialization of ExpensesApiRequest to create a new expense.
+ * Specialization of ExpensesApiRequest to register a  mobile with the API so that
+ * norifications can be received.
  */
-public class ExpensesApiNewExpenseRequest extends ExpensesApiRequest {
-  public ExpensesApiNewExpenseRequest(JSONObject expense) throws IllegalArgumentException {
+public class ExpensesApiRegisterMobileRequest extends ExpensesApiRequest {
 
-    // API call to create a new expense is:
-    // POST /expenses/:username?auth_token=token
-    setRequestMethod("POST");
-    setUrl(ExpensesApiContract.URL + "/expenses/"
-        + ExpensesAccountResolver.getInstance().getUsername()
-        + "?auth_token=" + ExpensesAccountResolver.getInstance().getAuthorizationToken());
-    setRequestData(expense);
+  public ExpensesApiRegisterMobileRequest(String registration_id) throws IllegalArgumentException {
+
+    // API call to register a mobile is:
+    // POST /mobiles/:username/auth_token
+    try {
+      setRequestMethod("POST");
+      setUrl(ExpensesApiContract.URL + "/mobiles/"
+          + ExpensesAccountResolver.getInstance().getUsername()
+          + "?auth_token=" + ExpensesAccountResolver.getInstance().getAuthorizationToken());
+      setRequestData(new JSONObject("{gcmRegistrationId:" + registration_id + "}"));
+    } catch (JSONException e) {
+      throw new IllegalArgumentException();
+    }
+
   }
-
 }
+

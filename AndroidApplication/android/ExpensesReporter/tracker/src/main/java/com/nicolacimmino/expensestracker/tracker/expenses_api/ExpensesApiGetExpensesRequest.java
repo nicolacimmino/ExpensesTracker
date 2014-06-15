@@ -19,6 +19,8 @@
  */
 package com.nicolacimmino.expensestracker.tracker.expenses_api;
 
+import com.nicolacimmino.expensestracker.tracker.data_sync.ExpensesAccountResolver;
+
 import org.json.JSONArray;
 
 /*
@@ -26,12 +28,14 @@ import org.json.JSONArray;
  */
 public class ExpensesApiGetExpensesRequest extends ExpensesApiRequest {
 
-  public ExpensesApiGetExpensesRequest(String username, String auth_token) {
+  public ExpensesApiGetExpensesRequest() {
 
     // API call to get all expenses is:
     // GET /expenses/:username
     setRequestMethod("GET");
-    setUrl(ExpensesAPIContract.URL + "/expenses/" + username + "?auth_token=" + auth_token);
+    setUrl(ExpensesApiContract.URL + "/expenses/"
+        + ExpensesAccountResolver.getInstance().getUsername()
+        + "?auth_token=" + ExpensesAccountResolver.getInstance().getAuthorizationToken());
   }
 
   // Gets the expenses returned by the API.
