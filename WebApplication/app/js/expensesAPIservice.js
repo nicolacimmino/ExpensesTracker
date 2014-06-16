@@ -21,6 +21,9 @@
 // Add a factory to encapsulate the Expenses API.
 // Note that the API has CORS enabled so we don't need to use
 //  JSOND on the client side to circumvent the same origin policy. 
+// WARN: For test purposes I deplyed the API on standard HTTP. You
+// never want to do this but to use HTTPS othrwise user authentication
+// and all other data will be sent in clear over the wire.
 angular.module('ExpensesWebClient.expensesAPIservice').
   factory('expensesAPIservice', function($http, localStorageService) {
 
