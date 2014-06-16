@@ -79,7 +79,7 @@ angular.module('ExpensesWebClient.expensesAPIservice').
         });
       }
 
-    // Get all acounts.
+    // Get all accounts.
     expensesAPIservice.getAccounts = function(authToken) {
         return $http({
           method: 'GET', 
@@ -87,5 +87,12 @@ angular.module('ExpensesWebClient.expensesAPIservice').
         });
       }
       
+    // Get all mobiles.
+    expensesAPIservice.getMobiles = function(authToken) {
+        return $http({
+          method: 'GET', 
+          url: 'http://expensesapi.nicolacimmino.com/mobiles/' + localStorageService.get('username') + '?auth_token=' + authToken
+        });
+      }
     return expensesAPIservice;
   });

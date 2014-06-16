@@ -47,7 +47,7 @@ public class TransactionsInputActivity extends Activity {
 
     super.onCreate(savedInstanceState);
 
-    setContentView(R.layout.activity_main);
+    setContentView(R.layout.activity_transactions_input);
 
     // Add values to the source spinner.
     Spinner sourceSpinner = (Spinner) findViewById(R.id.sourceSpinner);
@@ -108,7 +108,7 @@ public class TransactionsInputActivity extends Activity {
    */
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.main, menu);
+    getMenuInflater().inflate(R.menu.menu_transactions_input, menu);
     return true;
   }
 

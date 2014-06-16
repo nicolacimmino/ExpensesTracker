@@ -37,7 +37,7 @@ router.post('/:username', function(req, res) {
         try {
               db.collection('mobiles').update(
                 { gcmRegistrationId:req.body.gcmRegistrationId },
-                { username:req.params.username, gcmRegistrationId:req.body.gcmRegistrationId},
+                { username:req.params.username, gcmRegistrationId:req.body.gcmRegistrationId, mobile:req.body.mobile, last_seen:new Date().toJSON()},
                 { upsert: true}
               );
        } catch (err) {
@@ -49,4 +49,37 @@ router.post('/:username', function(req, res) {
      });
 });
 
+
+/* HTTP GET /mobiles/:username?auth_token=auth_token
+ * Param username: the username of the user..
+ * Query param auth_token: a valid authoerization tolken
+ * Returns: A list of mobiles.
+ * Error: 401 if the auth_token doesn't authorize the operation.
+ * Gets a list of all mobiles registered for a user.
+ */
+router.get('/:username', function(req, res) {
+  
+  var db = req.db;
+ 
+  accessControl.authorizeCreate(req.params.username, req.query.auth_token, function() {
+        try {
+              db.collection('mobiles').find(
+                { username:req.params.username },
+                {}, 
+                function(e,docs){
+                  try {
+                    res.json( docs );
+                  } catch (e) {
+                    res.send(401);
+                  }
+                }
+              );
+       } catch (err) {
+         res.send(401);
+       }
+     },
+     function() {
+        res.send(401);
+     });
+});
 module.exports = router;

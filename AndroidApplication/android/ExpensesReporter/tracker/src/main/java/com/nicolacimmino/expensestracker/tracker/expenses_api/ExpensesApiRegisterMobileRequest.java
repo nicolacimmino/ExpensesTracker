@@ -39,7 +39,13 @@ public class ExpensesApiRegisterMobileRequest extends ExpensesApiRequest {
       setUrl(ExpensesApiContract.URL + "/mobiles/"
           + ExpensesAccountResolver.getInstance().getUsername()
           + "?auth_token=" + ExpensesAccountResolver.getInstance().getAuthorizationToken());
-      setRequestData(new JSONObject("{gcmRegistrationId:" + registration_id + "}"));
+
+      JSONObject requestBody = new JSONObject();
+      requestBody.put("gcmRegistrationId", registration_id);
+      requestBody.put("mobile", android.os.Build.MODEL);
+      setRequestData(requestBody);
+      
+
     } catch (JSONException e) {
       throw new IllegalArgumentException();
     }

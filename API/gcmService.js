@@ -37,11 +37,11 @@ module.exports.notifyUserMobiles = function(db, username, reporter_gcm_reg_id) {
 
               gcm.send(message, function(err, messageId){
                   if (err) {
-                      console.log("Something has gone wrong!");
-                  } else {
-                      console.log("Sent with message ID: ", messageId);
+                      console.log("Something has gone wrong sending GCM message!");
                   }
               });
+              
+              db.collection('mobiles').update({_id:docs[ix]._id}, { $inc: { notifications:1 }}, {safe:true}, function(err, result) { console.log(err);});
             }
           }
         } catch (e) {

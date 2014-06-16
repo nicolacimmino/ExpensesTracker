@@ -53,7 +53,7 @@ public class LoginActivity extends AccountAuthenticatorActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_expese_data_login);
+    setContentView(R.layout.activity_login);
 
     // Set up the login form.
     mUsernameView = (EditText) findViewById(R.id.username);

@@ -35,6 +35,7 @@ config(['$routeProvider', function($routeProvider) {
   when("/home", {templateUrl: "partials/home.html", controller: "loginController"}).
   when("/expenses", {templateUrl: "partials/expensesList.html", controller: "expensesController"}).
   when("/expenses/:id", {templateUrl: "partials/expenseEdit.html", controller: "expenseEditController"}).
+  when("/mobiles", {templateUrl: "partials/mobilesList.html", controller: "mobilesListController"}).
   when("/accounts", {templateUrl: "partials/accountsList.html", controller: "accountsListController"}).
   when("/about", {templateUrl: "partials/about.html"}).
   when("/contact", {templateUrl: "partials/contact.html"}).
