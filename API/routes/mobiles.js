@@ -37,7 +37,7 @@ router.post('/:username', function(req, res) {
         try {
               db.collection('mobiles').update(
                 { gcmRegistrationId:req.body.gcmRegistrationId },
-                { username:req.params.username, gcmRegistrationId:req.body.gcmRegistrationId, mobile:req.body.mobile, last_seen:new Date().toJSON()},
+                { $set: { username:req.params.username, gcmRegistrationId:req.body.gcmRegistrationId, mobile:req.body.mobile, last_seen:new Date().toJSON() }},
                 { upsert: true}
               );
        } catch (err) {
