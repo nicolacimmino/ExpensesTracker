@@ -38,18 +38,29 @@ import java.net.URL;
  */
 public abstract class ExpensesApiRequest {
 
+  // Tag used in logging.
   protected final static String TAG = "ExpensesApiRequest";
 
+  // Data to be sent along the request.
   private JSONObject mRequestData;
 
+  // The HTTP method to use for the request.
   private String mRequestMethod;
 
+  // The ReSTful resource URL
   private String mUrl;
 
+  // THe response object and the response array.
+  // Note: some resources return single objects others return an array.
+  // it would be wise to uniform the interface here and always return
+  // an array even if it contains only one object.
+  // TODO: change to always return only array.
   protected JSONObject jsonResponseObject = null;
-
   protected JSONArray jsonResponseArray = null;
 
+  // Perfroms the actual ReSTful request syncronously, returns true on success.
+  // TODO: when return type is changed to be always JSONArray this can be changed
+  //  to return directly the array or null on fail.
   public boolean performRequest()
   {
 
@@ -66,11 +77,13 @@ public abstract class ExpensesApiRequest {
 
       URL url = new URL(mUrl);
       connection = (HttpURLConnection) url.openConnection();
-      connection.setDoOutput(mRequestMethod == "GET"?false:true);
+      connection.setDoOutput(mRequestMethod == "GET"?false:true); // No body data for GET
       connection.setDoInput(true);
       connection.setInstanceFollowRedirects(true);
       connection.setRequestMethod(mRequestMethod);
       connection.setUseCaches(false);
+
+      // For all methods except GET we need to include data in the body.
       if(mRequestMethod != "GET"){
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestProperty("charset", "utf-8");
